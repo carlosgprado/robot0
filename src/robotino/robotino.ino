@@ -7,7 +7,10 @@
 void setup() {
     // Setup the serial connection
     Serial.begin(9600);
-    }
+
+    // HC-SR04 ultrasonic module
+    setup_rangefinder();
+}
 
 
 void loop() {
