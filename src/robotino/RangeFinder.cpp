@@ -15,7 +15,7 @@ RangeFinder::RangeFinder(int trigPin, int echoPin) {
     digitalWrite(_trigPin, LOW);
 }
 
-RangeFinder::getDistance() {
+float RangeFinder::getDistance() {
     // Measure the distant to an object in front
     // of the sensor (in cm.)
     

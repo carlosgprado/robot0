@@ -3,7 +3,7 @@
   *
   */
 
-#include <RangeFinder.h>
+#include "RangeFinder.h"
 
 
 // HC-SR04 ultrasonic module
@@ -23,7 +23,7 @@ void loop() {
     // while (!Serial) {}
     // if (Serial.available() > 0) { /* do stuff with serial data */ }
 
-    Serial.println(rf01.getDistance())
+    Serial.println(rf01.getDistance());
     delay(500);
     }
 

@@ -15,8 +15,8 @@ class RangeFinder {
         float getDistance();
 
     private:
-        const int _trigPin;
-        const int _echoPin;
+        int _trigPin;
+        int _echoPin;
 };
 
 #endif
