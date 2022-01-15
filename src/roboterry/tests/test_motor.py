@@ -12,10 +12,25 @@ def main():
 
 	mc = MotorController()
 
-	# back_and_forth(times=3)
-	mc.backward(4)
-
+	back_and_forth(times=2)
 	forward_and_right_turn(times=3)
+
+	# Check locking mechanism
+	mc.lock()
+	# Should abort with an error message
+	mc.forward(1)
+
+	# Unlock the motors
+	mc.unlock()
+
+	# This will work, since we are unlocked
+	mc.turn_left(1.5)
+
+
+def loop_circle(times=1):
+	for _ in range(times):
+		mc.turn_left(timeout=4)
+		mc.turn_right(timeout=4)
 
 
 def back_and_forth(times=1):
@@ -23,11 +38,12 @@ def back_and_forth(times=1):
 		mc.backward(1.5)
 		mc.forward(1.5)
 
+
 def forward_and_right_turn(times=1):
 	for _ in range(times):
-		mc.forward(0.8)
-		time.sleep(0.5)
-		mc.turn_right(0.8)
+		mc.forward(0.5)
+		time.sleep(0.2)
+		mc.turn_right(0.5)
 
 
 if __name__ == '__main__':
