@@ -13,143 +13,231 @@
 import time
 import RPi.GPIO as gpio
 
+LOW = 0
+HIGH = 1
+
 
 class MotorController:
-	def __init__(self):
-		self.right_in = 23  # In1
-		self.right_out = 24 # In2
-		self.left_in = 22	# In3
-		self.left_out = 27	# In4
+    def __init__(self):
+        self.right_in = 23  # In1
+        self.right_out = 24 # In2
+        self.left_in = 22   # In3
+        self.left_out = 27  # In4
+        self.left_en = 13   # EnA
+        self.right_en = 12  # EnB
 
-		gpio.setwarnings(False)
+        # PWM
+        self.left_pwm = None
+        self.right_pwm = None
 
-		self.locked = False
-		self._setup_pins()
+        gpio.setwarnings(False)
 
-		self.stop()
+        self.locked = False
+        self.speed_left = 33
+        self.speed_right = 33
 
-	def _setup_pins(self):
-		gpio.setmode(gpio.BCM)
+        self._setup_pins()
 
-		gpio.setup(self.right_in, gpio.OUT)				
-		gpio.setup(self.right_out, gpio.OUT)				
-		gpio.setup(self.left_in, gpio.OUT)				
-		gpio.setup(self.left_out, gpio.OUT)
+        self.stop()
 
-	def check_lock(f):
-		def wrapper(self, *args):
-			if self.locked:
-				print("[+] Motors are locked by software.")
-			else:
-				f(self, *args)
-		return wrapper
+    def _setup_pins(self):
+        gpio.setmode(gpio.BCM)
 
-	def stop(self):
-		"""Collaborate and listen"""
+        gpio.setup(self.right_in, gpio.OUT)
+        gpio.setup(self.right_out, gpio.OUT)
+        gpio.setup(self.left_in, gpio.OUT)
+        gpio.setup(self.left_out, gpio.OUT)
+        gpio.setup(self.left_en, gpio.OUT)
+        gpio.setup(self.right_en, gpio.OUT)
 
-		gpio.output(self.left_in, False)
-		gpio.output(self.left_out, False)
-		gpio.output(self.right_in, False)
-		gpio.output(self.right_out, False)
+        # PWM
+        self.left_pwm = gpio.PWM(self.left_en, 1000)
+        self.right_pwm = gpio.PWM(self.right_en, 1000)
 
-	def lock(self):
-		self.locked = True
+        self.left_pwm.start(self.speed_left)
+        self.right_pwm.start(self.speed_right)
 
-	def unlock(self):
-		self.locked = False
+    def check_lock(f):
+        def wrapper(self, *args):
+            if self.locked:
+                print("[+] Motors are locked by software.")
+            else:
+                f(self, *args)
 
-	def is_locked(self):
-		return self.locked
+        return wrapper
 
-	# ------------------------------------------------
-	# Elementary movements (independent sides)
-	# ------------------------------------------------
-	@check_lock
-	def _left_forward(self, timeout=0):
-		gpio.output(self.left_in, False)
-		gpio.output(self.left_out, True)
+    def stop(self):
+        """Collaborate and listen"""
 
-	@check_lock
-	def _right_forward(self, timeout=0):
-		gpio.output(self.right_in, False)
-		gpio.output(self.right_out, True)
+        gpio.output(self.left_in, LOW)
+        gpio.output(self.left_out, LOW)
+        gpio.output(self.right_in, LOW)
+        gpio.output(self.right_out, LOW)
 
-	@check_lock
-	def _left_backward(self, timeout=0):
-		gpio.output(self.left_in, True)
-		gpio.output(self.left_out, False)
+        # Stop PWM
+        # self.left_pwm.stop()
+        # self.right_pwm.stop()
 
-	@check_lock
-	def _right_backward(self, timeout=0):
-		gpio.output(self.right_in, True)
-		gpio.output(self.right_out, False)
-	
-	# ------------------------------------------------
-	# Basics movements (forward, backward, etc.)
-	# These are combinations of elementary movements
-	# ------------------------------------------------
-	@check_lock
-	def forward(self, timeout=0):
-		"""Call without arguments to go forward forever"""
+    def lock(self):
+        self.locked = True
 
-		# The combination defines the motor polarity
-		# May need tweaking due to wrong cabling assumptions
-		self._right_forward()
-		self._left_forward()
+    def unlock(self):
+        self.locked = False
 
-		if timeout > 0:
-			time.sleep(timeout)
-			self.stop()
+    def is_locked(self):
+        return self.locked
 
-	@check_lock
-	def backward(self, timeout=0):
-		"""Call without arguments to go backwards forever"""
+    # ------------------------------------------------
+    # Set speed
+    # ------------------------------------------------
+    @check_lock
+    def _set_speed_left(self, speed=0):
+        """Speed between 0.0, 100.0"""
 
-		self._right_backward()
-		self._left_backward()
+        self.speed_left = speed
+        self.left_pwm.ChangeDutyCycle(speed)
 
-		if timeout > 0:
-			time.sleep(timeout)
-			self.stop()
+    @check_lock
+    def _set_speed_right(self, speed=0):
+        """Speed between 0.0, 100.0"""
 
-	@check_lock
-	def turn_right(self, timeout=0):
-		"""Call without arguments to circle forever :)"""
+        self.speed_right = speed
+        self.right_pwm.ChangeDutyCycle(speed)
 
-		self._left_forward()
+    @check_lock
+    def set_speed(self, speed=0):
+        """Speed between 0.0, 100.0"""
 
-		if timeout > 0:
-			time.sleep(timeout)
-			self.stop()
+        self.speed = speed
 
-	@check_lock
-	def turn_left(self, timeout=0):
-		"""Call without arguments to circle forever :)"""
+        self._set_speed_left(self.speed)
+        self._set_speed_right(self.speed)
 
-		self._right_forward()
+    # ------------------------------------------------
+    # Elementary movements (independent sides)
+    # ------------------------------------------------
+    @check_lock
+    def _left_forward(self, timeout=0):
+        gpio.output(self.left_in, LOW)
+        gpio.output(self.left_out, HIGH)
 
-		if timeout > 0:
-			time.sleep(timeout)
-			self.stop()
+        if timeout > 0:
+            time.sleep(timeout)
+            self.stop()
 
-	@check_lock
-	def turn_right_backward(self, timeout=0):
-		"""Call without arguments to circle forever"""
+    @check_lock
+    def _right_forward(self, timeout=0):
+        gpio.output(self.right_in, LOW)
+        gpio.output(self.right_out, HIGH)
 
-		self._left_backward()
+        if timeout > 0:
+            time.sleep(timeout)
+            self.stop()
 
-		if timeout > 0:
-			time.sleep(timeout)
-			self.stop()
+    @check_lock
+    def _left_backward(self, timeout=0):
+        gpio.output(self.left_in, HIGH)
+        gpio.output(self.left_out, LOW)
 
-	@check_lock
-	def turn_left_backward(self, timeout=0):
-		"""Call without arguments to circle forever"""
+        if timeout > 0:
+            time.sleep(timeout)
+            self.stop()
 
-		self._right_backward()
+    @check_lock
+    def _right_backward(self, timeout=0):
+        gpio.output(self.right_in, HIGH)
+        gpio.output(self.right_out, LOW)
 
-		if timeout > 0:
-			time.sleep(timeout)
-			self.stop()
+        if timeout > 0:
+            time.sleep(timeout)
+            self.stop()
+
+    # ------------------------------------------------
+    # Basics movements (forward, backward, etc.)
+    # These are combinations of elementary movements
+    # ------------------------------------------------
+    @check_lock
+    def forward(self, timeout=0):
+        """Call without arguments to go forward forever"""
+
+        # The combination defines the motor polarity
+        # May need tweaking due to wrong cabling assumptions
+        self._right_forward()
+        self._left_forward()
+
+        if timeout > 0:
+            time.sleep(timeout)
+            self.stop()
+
+    @check_lock
+    def backward(self, timeout=0):
+        """Call without arguments to go backwards forever"""
+
+        self._right_backward()
+        self._left_backward()
+
+        if timeout > 0:
+            time.sleep(timeout)
+            self.stop()
+
+    @check_lock
+    def turn_right(self, timeout=0):
+        """Call without arguments to circle forever :)"""
+
+        # The motors can not do this at low speeds.
+        # Temporarily set this to 100% for the turn
+        saved_speed = self.speed_left
+        self._set_speed_left(100)
+        self._left_forward()
+
+        if timeout > 0:
+            time.sleep(timeout)
+            self.stop()
+
+        self._set_speed_left(saved_speed)
+
+    @check_lock
+    def turn_left(self, timeout=0):
+        """Call without arguments to circle forever :)"""
+
+        # The motors can not do this at low speeds.
+        # Temporarily set this to 100% for the turn
+        saved_speed = self.speed_right
+        self._set_speed_right(100)
+        self._right_forward()
+
+        if timeout > 0:
+            time.sleep(timeout)
+            self.stop()
+
+        self._set_speed_right(saved_speed)
+
+    @check_lock
+    def turn_right_backward(self, timeout=0):
+        """Call without arguments to circle forever"""
+
+        saved_speed = self.speed_left
+        self._set_speed_left(100)
+        self._left_backward()
+
+        if timeout > 0:
+            time.sleep(timeout)
+            self.stop()
+
+        self._set_speed_left(saved_speed)
+
+    @check_lock
+    def turn_left_backward(self, timeout=0):
+        """Call without arguments to circle forever"""
+
+        saved_speed = self.speed_right
+        self._set_speed_right(100)
+        self._right_backward()
+
+        if timeout > 0:
+            time.sleep(timeout)
+            self.stop()
+
+        self._set_speed_right(saved_speed)
 
 
