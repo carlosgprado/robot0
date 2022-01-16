@@ -21,6 +21,8 @@ class MotorController:
 		self.left_in = 22	# In3
 		self.left_out = 27	# In4
 
+		gpio.setwarnings(False)
+
 		self.locked = False
 		self._setup_pins()
 

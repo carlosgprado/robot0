@@ -18,13 +18,15 @@ c = threading.Condition()
 def main():
     
     motor_thread = MotorThread()
-    comms_thread = commsThread()
+    comms_thread = CommsThread()
 
     motor_thread.start()
     comms_thread.start()
 
     comms_thread.join()
     motor_thread.join()
+
+    print("[+] Threads started")
 
 
 class MotorThread(threading.Thread):
@@ -40,16 +42,22 @@ class MotorThread(threading.Thread):
         # -------------------------------------
         mc = MotorController()
 
+        print("[+] Motor controller OK")
+        print("[+]", mc)
+
         # Sicher is sicher
         # mc.lock()
 
-        # Go forward
-        mc.forward()
+        print("[+] Motor is locked: ", mc.is_locked())
+
+        time.sleep(1)
 
         # TODO: more movements or whatever
+        mc.forward()
+        print("[+] Going forward...")
 
 
-class commsThread(threading.Thread):
+class CommsThread(threading.Thread):
     def __init__(self, name="comms"):
         threading.Thread.__init__(self)
         self.name = name
@@ -65,12 +73,15 @@ class commsThread(threading.Thread):
                 baud_rate=9600,
                 timeout=1
                 )
+
+            print("[+] Serial comms OK")
+            print("[+]", cereal)
         except Exception as e:
             print(e)
             return 1
 
         while True:
-            time.sleep(0.1)
+            # time.sleep(0.005)
             bytez = cereal.receive_line()
 
             if not bytez:
@@ -89,10 +100,12 @@ class commsThread(threading.Thread):
                 # Probably garbage data
                 continue
 
+            print(distance)
             # -----------------------------------------
-            # If we are too close to something, STAHP
+            # If we are too close to something, STAHP.
             # -----------------------------------------
-            if distance <= 20:
+            if distance <= 30:
+                print(f"[+] STAHP: {distance} cm.")
                 mc.stop()
 
 

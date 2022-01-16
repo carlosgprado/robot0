@@ -17,13 +17,15 @@ def main():
 	print(cereal)
 
 	# Read some lines and print to screen
-	print("[+] Readins some lines...")
-	for _ in range(10):
+	print("[+] Reading some lines...")
+	while True:
 		bytez = cereal.receive_line()
 		if bytez:
-			print("[+] ", bytez)
-		else:
-			print("[-] Input buffer is empty")
+			data = bytez.strip(b"\r\n")
+			if data:
+				distance = float(data)
+				print("[+] ", distance, type(distance))
+				time.sleep(0.1)
 
 
 if __name__ == '__main__':
