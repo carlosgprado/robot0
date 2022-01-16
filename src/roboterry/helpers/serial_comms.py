@@ -31,9 +31,36 @@ class Cereal:
     def send(self):
         raise NotImplemented
 
-    def receive(self):
-        raise NotImplemented
+    def receive(self, size=0):
+        """Reads the specified number of bytes
+           or all remaining bytes on the input buffer.
+
+           Returns a null number of bytes if
+           the input buffer is empty
+        """
+
+        bytez = b""
+
+        inw = self.ser.in_waiting
+        if inw:
+            if size:
+                bytez = self.ser.read(size=size)
+            else:
+                bytez = self.ser.readall()
+
+        return bytez
 
     def receive_line(self):
-        raise NotImplemented
+        """Reads a line waiting on the input buffer
+           Usually the Arduino used `Serial.println`
+           on its side.
+        """
+
+        bytez = b""
+
+        if self.ser.in_waiting:
+            bytez = self.ser.read_line()
+
+        return bytez
+
 
