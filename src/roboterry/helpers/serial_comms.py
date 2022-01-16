@@ -7,7 +7,7 @@ import serial
 
 class Cereal:
     def __init__(self, device_name="", baud_rate=9600, timeout=1):
-        self.dev_name = device_name or "/dev/ttyAMA0"
+        self.dev_name = device_name or "/dev/ttyACM0"
         self.baud_rate = baud_rate
         self.timeout = timeout
 
@@ -25,8 +25,11 @@ class Cereal:
             )
 
     def send(self):
-        pass
+        raise NotImplemented
 
     def receive(self):
-        pass
+        raise NotImplemented
+
+    def receive_line(self):
+        raise NotImplemented
 
