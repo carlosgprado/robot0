@@ -28,6 +28,9 @@ class Cereal:
         if not self.ser.writable():
             raise RuntimeError("[-] Serial port NOT writable")
 
+        # Start from a clean slate
+        self.ser.flush()
+
     def send(self):
         raise NotImplemented
 
