@@ -62,7 +62,7 @@ class Cereal:
         bytez = b""
 
         if self.ser.in_waiting:
-            bytez = self.ser.read_line()
+            bytez = self.ser.readline()
 
         return bytez
 
