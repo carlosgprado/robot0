@@ -16,13 +16,17 @@ class Cereal:
         self._initialize_serial()
 
     def _initialize_serial(self):
-        # TODO: error checking
-
         self.ser = serial.Serial(
             self.dev_name,
             self.baud_rate,
             timeout=self.timeout
             )
+
+        if not self.ser.readable():
+            raise RuntimeError("[-] Serial port NOT readable")
+
+        if not self.ser.writable():
+            raise RuntimeError("[-] Serial port NOT writable")
 
     def send(self):
         raise NotImplemented
