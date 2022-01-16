@@ -23,8 +23,8 @@ def main():
     motor_thread.start()
     comms_thread.start()
 
-    motor_thread.join()
     comms_thread.join()
+    motor_thread.join()
 
 
 class MotorThread(threading.Thread):
@@ -41,10 +41,10 @@ class MotorThread(threading.Thread):
         mc = MotorController()
 
         # Sicher is sicher
-        mc.lock()
+        # mc.lock()
 
         # Go forward
-        mc.forward(timeout=60)
+        mc.forward()
 
         # TODO: more movements or whatever
 
