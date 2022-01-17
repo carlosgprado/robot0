@@ -63,6 +63,9 @@ class CommsThread(threading.Thread):
         self.name = name
 
     def run(self):
+        max_distance = 200
+        min_distance = 30
+
         # -------------------------------------
         # Setup serial communication
         # with the Arduino
@@ -81,7 +84,6 @@ class CommsThread(threading.Thread):
             return 1
 
         while True:
-            # time.sleep(0.005)
             bytez = cereal.receive_line()
 
             if not bytez:
@@ -93,20 +95,49 @@ class CommsThread(threading.Thread):
             #  input latter (maybe CSV?)
 
             data = bytez.strip(b"\r\n")
+
             try:
                 distance = float(data)
+
+                # Update the maximum distance
+                if distance > max_distance:
+                    max_distance = distance
             except Exception as e:
                 # Failed to convert to float
                 # Probably garbage data
+                print(f"[-] WAT DIS: {data}")
                 continue
 
             print(distance)
             # -----------------------------------------
+            # The sensor appears to measure max. 111 cm
+            # Diminishing distances will result in 
+            # lower speeds
+            # -----------------------------------------
+            delta = distance - min_distance
+            gamma = max_distance - min_distance
+
+            adjusted_speed = ((delta + 0.0) / gamma) * 100
+            # Just in case :)
+            if adjusted_speed > 100:
+                adjusted_speed = 100
+
+            if adjusted_speed < 0:
+                # This can happen due to spurious values
+                # in the input buffer (e.g. 0.0)
+                adjusted_speed = 33
+
+            mc.set_speed(adjusted_speed)
+
+            # -----------------------------------------
             # If we are too close to something, STAHP.
             # -----------------------------------------
-            if distance <= 30:
+            if distance <= min_distance:
                 print(f"[+] STAHP: {distance} cm.")
                 mc.stop()
+                mc.backward()
+            else:
+                mc.forward()
 
 
 if __name__ == '__main__':
