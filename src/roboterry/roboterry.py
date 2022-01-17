@@ -70,7 +70,7 @@ class CommsThread(threading.Thread):
         try:
             cereal = Cereal(
                 device_name='/dev/ttyACM0',
-                baud_rate=9600,
+                baud_rate=57600,
                 timeout=1
                 )
 
