@@ -2,6 +2,7 @@
 #define RangeFinder_h
 
 #include "Arduino.h"
+#include <HCSR04.h>
 
 class RangeFinder {
     public:
@@ -17,6 +18,7 @@ class RangeFinder {
     private:
         int _trigPin;
         int _echoPin;
+        HCSR04 _hc;
 };
 
 #endif

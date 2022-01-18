@@ -5,9 +5,14 @@
 #include "Arduino.h"
 #include "RangeFinder.h"
 
+
+/** Constructor */
 RangeFinder::RangeFinder(int trigPin, int echoPin) {
     _trigPin = trigPin;
     _echoPin = echoPin;
+
+    // Initialize the HCSR04 object
+    _hc(_trigPin, _echoPin);
 
     // Setup
     pinMode(_trigPin, OUTPUT);
@@ -18,17 +23,7 @@ RangeFinder::RangeFinder(int trigPin, int echoPin) {
 float RangeFinder::getDistance() {
     // Measure the distant to an object in front
     // of the sensor (in cm.)
-    
-    // Emit a 10 us burst
-    digitalWrite(_trigPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(_trigPin, LOW);
 
-    // Read echo
-    duration = pulseIn(_echoPin, HIGH);
-    distance = duration / 58.2;
-
-    return distance;
+    return _hc.dist();
 }
-
 
