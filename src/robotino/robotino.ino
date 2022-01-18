@@ -14,7 +14,7 @@ RangeFinder rf01(7, 8);
 
 void setup() {
     // Setup the serial connection
-    Serial.begin(57600);
+    Serial.begin(9600);
 }
 
 

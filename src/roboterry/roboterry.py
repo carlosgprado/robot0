@@ -5,6 +5,7 @@
 import time
 import random
 import threading
+import argparse
 
 from helpers.serial_comms import Cereal
 from helpers.motors import MotorController
@@ -16,7 +17,10 @@ c = threading.Condition()
 
 
 def main():
-    
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--locked", action='store_true', default=False)
+    args = parser.parse_args()
+
     motor_thread = MotorThread()
     comms_thread = CommsThread()
 
@@ -30,9 +34,10 @@ def main():
 
 
 class MotorThread(threading.Thread):
-    def __init__(self, name="motor"):
+    def __init__(self, name="motor", locked=False):
         threading.Thread.__init__(self)
         self.name = name
+        self.locked = locked
 
     def run(self):
         global mc
@@ -46,7 +51,8 @@ class MotorThread(threading.Thread):
         print("[+]", mc)
 
         # Sicher is sicher
-        # mc.lock()
+        if self.locked:
+            mc.lock()
 
         print("[+] Motor is locked: ", mc.is_locked())
 
@@ -72,7 +78,7 @@ class CommsThread(threading.Thread):
         try:
             cereal = Cereal(
                 device_name='/dev/ttyACM0',
-                baud_rate=57600,
+                baud_rate=9600,
                 timeout=1
                 )
 
@@ -104,7 +110,7 @@ class CommsThread(threading.Thread):
                 mc.stop()
                 continue
 
-            print(f"[+] {distance}")
+            print(f"[+] dis: {distance:.2f}, speed: ({mc.speed_left:.2f}, {mc.speed_right:.2f})")
             # -----------------------------------------
             # The sensor outputs some weird shit 
             # sometimes. We need some failsafes.
@@ -119,10 +125,12 @@ class CommsThread(threading.Thread):
             # -----------------------------------------
             # The sensor appears to measure max. 400 cm
             # Diminishing distances will result in 
-            # lower speeds
+            # lower speeds.
+            # NOTE: the max. distance this can measure
+            #       is around 400 cm
             # -----------------------------------------
-            if distance > 100:
-                adjusted_speed = 100 / 3
+            if distance > 200:
+                adjusted_speed = 200 / 3
             else:
                 adjusted_speed = distance / 3
 
@@ -134,9 +142,12 @@ class CommsThread(threading.Thread):
             if distance <= min_distance:
                 print(f"[+] STAHP: {distance} cm.")
                 mc.stop()
-                mc.backward()
+                mc.backward(1)
+
+                # Turn around
+                mc.turn_right(2)
             else:
-                mc.forward()
+                mc.forward(2)
 
 
 if __name__ == '__main__':

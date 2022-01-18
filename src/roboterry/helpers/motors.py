@@ -33,6 +33,7 @@ class MotorController:
         gpio.setwarnings(False)
 
         self.locked = False
+        self.speed = 33
         self.speed_left = 33
         self.speed_right = 33
 
