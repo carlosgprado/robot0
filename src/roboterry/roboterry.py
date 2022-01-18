@@ -21,7 +21,7 @@ def main():
     parser.add_argument("--locked", action='store_true', default=False)
     args = parser.parse_args()
 
-    motor_thread = MotorThread()
+    motor_thread = MotorThread(locked=args.locked)
     comms_thread = CommsThread()
 
     motor_thread.start()
@@ -129,8 +129,8 @@ class CommsThread(threading.Thread):
             # NOTE: the max. distance this can measure
             #       is around 400 cm
             # -----------------------------------------
-            if distance > 200:
-                adjusted_speed = 200 / 3
+            if distance > 100:
+                adjusted_speed = 100 / 3
             else:
                 adjusted_speed = distance / 3
 
@@ -146,8 +146,17 @@ class CommsThread(threading.Thread):
 
                 # Turn around
                 mc.turn_right(2)
+
+                # NOTE: when doing movements with a timeout
+                #  the thread is blocked, meaning the input
+                #  queue is filling up.
+                #  We need to either:
+                #  - flush it
+                #  - pass the movement information to the 
+                #    MotorController thread (better)
+                cereal._reset_queues()
             else:
-                mc.forward(2)
+                mc.forward()
 
 
 if __name__ == '__main__':

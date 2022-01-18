@@ -24,6 +24,6 @@ void loop() {
     // if (Serial.available() > 0) { /* do stuff with serial data */ }
 
     Serial.println(rf01.getDistance());
-    delay(500);
-    }
+    delay(60);
+}
 

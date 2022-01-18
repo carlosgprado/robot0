@@ -14,6 +14,7 @@ class Cereal:
         self.ser = None
 
         self._initialize_serial()
+        self._reset_queues()
 
     def _initialize_serial(self):
         self.ser = serial.Serial(
@@ -28,8 +29,9 @@ class Cereal:
         if not self.ser.writable():
             raise RuntimeError("[-] Serial port NOT writable")
 
-        # Start from a clean slate
-        # Discards the return value
+    def _reset_queues(self):
+        """Start from a clean slate"""
+
         self.ser.reset_input_buffer()
         self.ser.reset_output_buffer()
 
