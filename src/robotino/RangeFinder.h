@@ -18,7 +18,7 @@ class RangeFinder {
     private:
         int _trigPin;
         int _echoPin;
-        HCSR04 _hc;
+        HCSR04* _phc;
 };
 
 #endif

@@ -50,8 +50,6 @@ class MotorThread(threading.Thread):
 
         print("[+] Motor is locked: ", mc.is_locked())
 
-        time.sleep(1)
-
         # TODO: more movements or whatever
         mc.forward()
         print("[+] Going forward...")
@@ -63,8 +61,9 @@ class CommsThread(threading.Thread):
         self.name = name
 
     def run(self):
-        max_distance = 200
-        min_distance = 30
+        max_distance = 100
+        min_distance = 25
+        adjusted_speed = 100
 
         # -------------------------------------
         # Setup serial communication
@@ -98,34 +97,34 @@ class CommsThread(threading.Thread):
 
             try:
                 distance = float(data)
-
-                # Update the maximum distance
-                if distance > max_distance:
-                    max_distance = distance
             except Exception as e:
                 # Failed to convert to float
                 # Probably garbage data
                 print(f"[-] WAT DIS: {data}")
+                mc.stop()
                 continue
 
-            print(distance)
+            print(f"[+] {distance}")
             # -----------------------------------------
-            # The sensor appears to measure max. 111 cm
+            # The sensor outputs some weird shit 
+            # sometimes. We need some failsafes.
+            # -----------------------------------------
+            if distance < 0:
+                # Weird shit, indeed
+                # Poll more data, maybe transitory
+                mc.stop()
+                print(f"[-] -ENEG: {distance}")
+                continue
+
+            # -----------------------------------------
+            # The sensor appears to measure max. 400 cm
             # Diminishing distances will result in 
             # lower speeds
             # -----------------------------------------
-            delta = distance - min_distance
-            gamma = max_distance - min_distance
-
-            adjusted_speed = ((delta + 0.0) / gamma) * 100
-            # Just in case :)
-            if adjusted_speed > 100:
-                adjusted_speed = 100
-
-            if adjusted_speed < 0:
-                # This can happen due to spurious values
-                # in the input buffer (e.g. 0.0)
-                adjusted_speed = 33
+            if distance > 100:
+                adjusted_speed = 100 / 3
+            else:
+                adjusted_speed = distance / 3
 
             mc.set_speed(adjusted_speed)
 

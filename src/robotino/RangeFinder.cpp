@@ -12,7 +12,7 @@ RangeFinder::RangeFinder(int trigPin, int echoPin) {
     _echoPin = echoPin;
 
     // Initialize the HCSR04 object
-    _hc(_trigPin, _echoPin);
+    _phc = new HCSR04(_trigPin, _echoPin);
 
     // Setup
     pinMode(_trigPin, OUTPUT);
@@ -24,6 +24,6 @@ float RangeFinder::getDistance() {
     // Measure the distant to an object in front
     // of the sensor (in cm.)
 
-    return _hc.dist();
+    return _phc->dist();
 }
 

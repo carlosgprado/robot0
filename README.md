@@ -24,6 +24,7 @@ Raspberry Pi:
 * EnA Orange GPIO 12 (PWM)
 * EnB Orange GPIO 13 (PWM)
 
+
 ## Compiling the Arduino code
 
 This can be done from inside the Raspberry Pi itself.
@@ -37,4 +38,10 @@ Use the `arduino-cli` tool:
 ./arduino-cli core list
 ```
 
+
+## Arduino libraries
+
+```shell
+./arduino-cli lib install "HCSR04 ultrasonic sensor"
+```
 
