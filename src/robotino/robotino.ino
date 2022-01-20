@@ -26,6 +26,8 @@ void setup() {
     }
 
     md01.print_message("Hello, Kieran!");
+    delay(1000);
+    md01.show_face();
 }
 
 
