@@ -46,7 +46,7 @@ class MiniDisplay {
         bool begin();
         void clear();
         void display();
-        void print_message(const char *msg); 
+        void print_message(const char *msg);
         void show_face();
     private:
         Adafruit_SSD1306 *_pd;

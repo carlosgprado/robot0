@@ -25,12 +25,31 @@ bool MiniDisplay::begin() {
     return false;
 }
 
-void MiniDisplay::print_message(const char *msg) {
+void MiniDisplay::clear() {
     _pd->clearDisplay();
+}
+
+void MiniDisplay::display() {
+    _pd->display();
+}
+
+void MiniDisplay::print_message(const char *msg) {
+    clear()
     _pd->setTextSize(1);
     _pd->setTextColor(WHITE);
     _pd->setCursor(0, 0);
     _pd->println(msg);
-    _pd->display();
+    display();
 }
+
+void MiniDisplay::show_face() {
+    // Put a face on it!
+    clear();
+    int16_t radius = max(width, height) / 2;
+
+    // x, y, r, color
+    _pd->fillCircle(width / 2, height / 2, radius, SSD1306_WHITE);
+    display();
+}
+
 
