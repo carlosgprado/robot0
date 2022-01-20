@@ -37,13 +37,48 @@ void MiniDisplay::invert(bool bInvert) {
     _pd->invertDisplay(bInvert);
 }
 
-void MiniDisplay::print_message(const char *msg) {
+void MiniDisplay::message(const char *msg) {
     clear();
-    _pd->setTextSize(1.5);
+
+    _pd->setTextSize(1);
     _pd->setTextColor(WHITE);
     _pd->setCursor(0, 0);
     _pd->println(msg);
+
     display();
+}
+
+void MiniDisplay::large_message(const char *msg) {
+    clear();
+
+    _pd->setTextSize(2);
+    _pd->setTextColor(WHITE);
+    _pd->setCursor(0,0);
+    _pd->println(msg);
+
+    display();
+}
+
+void MiniDisplay::warning(const char *msg) {
+    clear();
+
+    _pd->setTextSize(1);
+    // Inverse text
+    _pd->setTextColor(SSD1306_BLACK, SSD1306_WHITE);
+    _pd->setCursor(0, 0);
+    _pd->println(msg);
+
+    display();
+}
+
+void MiniDisplay::scroll(const char *msg) {
+    large_message(msg);
+    delay(100);
+    _pd->startscrollright(0x00, 0x0F);
+}
+
+void MiniDisplay::no_scroll() {
+    _pd->stopscroll();
 }
 
 void MiniDisplay::normal_face() {

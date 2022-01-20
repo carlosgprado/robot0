@@ -47,7 +47,13 @@ class MiniDisplay {
         void clear();
         void display();
         void invert(bool bInvert);
-        void print_message(const char *msg);
+
+        // Text stuff
+        void message(const char *msg);
+        void large_message(const char *msg);
+        void warning(const char *msg);
+        void scroll(const char *msg);
+        void no_scroll();
 
         // Face stuff :)
         void normal_face();

@@ -27,17 +27,32 @@ void setup() {
       for(;;); // Don't proceed, loop forever
     }
 
-    md01.print_message("Hola, Kieran!");
+    md01.message("Hola, Kieran!");
     delay(1000);
-    md01.normal_face();
+    md01.large_message("robot0");
     md01.invert(true);
     delay(2000);
     md01.invert(false);
     delay(500);
-    for (int i=0; i <= 5; i++) {
+
+    // Blink
+    for (int i=0; i < 3; i++) {
         md01.do_blink(200);
-        delay(1000);
+        delay(2000);
     }
+
+    md01.message("Normal message");
+    delay(1000);
+
+    md01.large_message("Large message");
+    delay(1000);
+
+    md01.warning("Nostromo will autodestruct in 10 mins");
+    delay(1000);
+
+    md01.scroll("YUUUGGEE");
+    delay(1000);
+    md01.no_scroll();   
 }
 
 
@@ -48,5 +63,7 @@ void loop() {
 
     Serial.println(rf01.getDistance());
     delay(60);
+
+    md01.message(String(millis()).c_str());
 }
 
