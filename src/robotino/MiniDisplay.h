@@ -1,3 +1,6 @@
+#ifndef MiniDisplay_h
+#define MiniDisplay_h
+
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -11,8 +14,8 @@
 #define LOGO_HEIGHT   16
 #define LOGO_WIDTH    16
 
-static const unsigned char PROGMEM logo_bmp[] =
-{ B00000000, B11000000,
+static const unsigned char PROGMEM logo_bmp[] = {
+  B00000000, B11000000,
   B00000001, B11000000,
   B00000001, B11000000,
   B00000011, B11100000,
@@ -27,5 +30,25 @@ static const unsigned char PROGMEM logo_bmp[] =
   B00111111, B11110000,
   B01111100, B11110000,
   B01110000, B01110000,
-  B00000000, B00110000 };
+  B00000000, B00110000 
+};
+
+
+class MiniDisplay {
+    public:
+        int height = 0;
+        int width = 0;
+
+        // Constructor
+        MiniDisplay(int w, int h);
+
+        // Methods
+        bool begin();
+        void clear();
+        void print_message(const char *msg); 
+    private:
+        Adafruit_SSD1306 *_pd;
+};
+
+#endif
 
