@@ -6,6 +6,8 @@
 #include "RangeFinder.h"
 #include "MiniDisplay.h"
 
+#define SSD1306_NO_SPLASH
+
 
 // SSD1306 128x64 I2C
 MiniDisplay md01(SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -25,9 +27,17 @@ void setup() {
       for(;;); // Don't proceed, loop forever
     }
 
-    md01.print_message("Hello, Kieran!");
+    md01.print_message("Hola, Kieran!");
     delay(1000);
-    md01.show_face();
+    md01.normal_face();
+    md01.invert(true);
+    delay(2000);
+    md01.invert(false);
+    delay(500);
+    for (int i=0; i <= 5; i++) {
+        md01.do_blink(200);
+        delay(1000);
+    }
 }
 
 

@@ -46,8 +46,13 @@ class MiniDisplay {
         bool begin();
         void clear();
         void display();
+        void invert(bool bInvert);
         void print_message(const char *msg);
-        void show_face();
+
+        // Face stuff :)
+        void normal_face();
+        void blink_face();
+        void do_blink(int t);
     private:
         Adafruit_SSD1306 *_pd;
 };

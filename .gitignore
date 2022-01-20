@@ -131,4 +131,5 @@ dmypy.json
 
 # Arduino CLI binary
 arduino-cli
+*.swp
 

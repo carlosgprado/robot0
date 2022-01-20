@@ -33,23 +33,59 @@ void MiniDisplay::display() {
     _pd->display();
 }
 
+void MiniDisplay::invert(bool bInvert) {
+    _pd->invertDisplay(bInvert);
+}
+
 void MiniDisplay::print_message(const char *msg) {
-    clear()
-    _pd->setTextSize(1);
+    clear();
+    _pd->setTextSize(1.5);
     _pd->setTextColor(WHITE);
     _pd->setCursor(0, 0);
     _pd->println(msg);
     display();
 }
 
-void MiniDisplay::show_face() {
+void MiniDisplay::normal_face() {
     // Put a face on it!
+    // NOTE: xxxCircle(x, y, r, color)
     clear();
-    int16_t radius = max(width, height) / 2;
 
-    // x, y, r, color
-    _pd->fillCircle(width / 2, height / 2, radius, SSD1306_WHITE);
+    int16_t max_r = min(width, height) / 2;
+
+    // Left eyeball (larger)
+    _pd->drawCircle(0.30 * width, 0.40 * height, 0.75 * max_r, SSD1306_WHITE);
+    _pd->fillCircle(0.35 * width, 0.42 * height, 4, SSD1306_WHITE);
+
+    // Right eyeball (smaller)
+    _pd->drawCircle(0.75 * width, 0.50 * height, 0.55 * max_r, SSD1306_WHITE);
+    _pd->fillCircle(0.80 * width, 0.52 * height, 3, SSD1306_WHITE);
+
     display();
 }
 
+void MiniDisplay::blink_face() {
+    // Blinking eyez: ><
+    // NOTE: drawLine(x1, y1, x2, y2, color)
+    clear();
 
+    // Left blink
+    _pd->drawLine(0.35 * width - 20, 0.42 * height - 10, 0.35 * width, 0.42 * height, SSD1306_WHITE);
+    _pd->drawLine(0.35 * width - 16, 0.42 * height + 8, 0.35 * width, 0.42 * height, SSD1306_WHITE);
+
+    // Right blink
+    _pd->drawLine(0.80 * width, 0.52 * height, 0.80 * width + 16, 0.52 * height - 10, SSD1306_WHITE);
+    _pd->drawLine(0.80 * width, 0.52 * height, 0.72 * width + 18, 0.52 * height + 0, SSD1306_WHITE);
+
+    display();
+}
+
+void MiniDisplay::do_blink(int t) {
+    // Trick: let's make sure that the normal face 
+    // is present before blinking
+    normal_face();
+    delay(250);
+    blink_face();
+    delay(t);
+    normal_face();
+}
