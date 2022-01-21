@@ -37,6 +37,25 @@ void splash() {
 
 }
 
+void track_the_blinks() {
+    // This keeps some state to keep track
+    // of the face's blinking state
+    static unsigned long last_blink = 0;
+    static bool is_blink_face = false;
+
+    if (is_blink_face) {
+        if (millis() - last_blink > 200) {
+            normal_face();
+            is_blink_face = false;
+        }
+    }
+
+    if (millis() - last_blink > 2000) {
+        last_blink = millis();  // TOCTOU, LOL
+        is_blink_face = true;
+        blinking_face();
+    }
+}
 
 void setup() {
     // Setup the serial connection
@@ -58,9 +77,10 @@ void loop() {
     // while (!Serial) {}
     // if (Serial.available() > 0) { /* do stuff with serial data */ }
 
-    Serial.println(rf01.getDistance());
+    // Serial.println(rf01.getDistance());
     delay(60);
 
-    md01.message(String(millis()).c_str());
-}
+    Serial.println(millis());
 
+    track_the_blinks();
+}
