@@ -18,28 +18,35 @@ MiniDisplay md01(SCREEN_WIDTH, SCREEN_HEIGHT);
 RangeFinder rf01(7, 8);
 
 
-void setup() {
-    // Setup the serial connection
-    Serial.begin(9600);
-
-    if(!md01.begin()) { 
-      Serial.println(F("SSD1306 allocation failed"));
-      for(;;); // Don't proceed, loop forever
-    }
-
-    // Kind of an splash message
+void splash() {
+    // Dynamic splash message
     md01.large_message("robot0", 30, 25);
     md01.invert(true);
     delay(2000);
     md01.invert(false);
     delay(500);
 
-    // Blink
+    // Blink a couple of times :)
     for (int i=0; i < 2; i++) {
         md01.do_blink();
         delay(2000);
     }
 
+}
+
+
+void setup() {
+    // Setup the serial connection
+    Serial.begin(9600);
+
+    // Setup the MiniDisplay
+    if(!md01.begin()) { 
+      Serial.println(F("SSD1306 allocation failed"));
+      for(;;); // Don't proceed, loop forever
+    }
+
+    // Be classy
+    splash();
 }
 
 
