@@ -45,7 +45,7 @@ void track_the_blinks() {
 
     if (is_blink_face) {
         if (millis() - last_blink > 200) {
-            normal_face();
+            md01.normal_face();
             is_blink_face = false;
         }
     }
@@ -53,7 +53,7 @@ void track_the_blinks() {
     if (millis() - last_blink > 2000) {
         last_blink = millis();  // TOCTOU, LOL
         is_blink_face = true;
-        blinking_face();
+        md01.blinking_face();
     }
 }
 
