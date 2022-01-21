@@ -27,9 +27,8 @@ void setup() {
       for(;;); // Don't proceed, loop forever
     }
 
-    md01.message("Hola, Kieran!");
-    delay(1000);
-    md01.large_message("robot0");
+    // Kind of an splash message
+    md01.large_message("robot0", 20, 10);
     md01.invert(true);
     delay(2000);
     md01.invert(false);
@@ -37,22 +36,10 @@ void setup() {
 
     // Blink
     for (int i=0; i < 3; i++) {
-        md01.do_blink(200);
+        md01.do_blink();
         delay(2000);
     }
 
-    md01.message("Normal message");
-    delay(1000);
-
-    md01.large_message("Large message");
-    delay(1000);
-
-    md01.warning("Nostromo will autodestruct in 10 mins");
-    delay(1000);
-
-    md01.scroll("YUUUGGEE");
-    delay(1000);
-    md01.no_scroll();   
 }
 
 

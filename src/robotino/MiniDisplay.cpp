@@ -37,35 +37,35 @@ void MiniDisplay::invert(bool bInvert) {
     _pd->invertDisplay(bInvert);
 }
 
-void MiniDisplay::message(const char *msg) {
+void MiniDisplay::message(const char *msg, int16_t x = 0, int16_t y = 0) {
     clear();
 
     _pd->setTextSize(1);
     _pd->setTextColor(WHITE);
-    _pd->setCursor(0, 0);
+    _pd->setCursor(x, y);
     _pd->println(msg);
 
     display();
 }
 
-void MiniDisplay::large_message(const char *msg) {
+void MiniDisplay::large_message(const char *msg, int16_t x = 0, int16_t y = 0) {
     clear();
 
     _pd->setTextSize(2);
     _pd->setTextColor(WHITE);
-    _pd->setCursor(0,0);
+    _pd->setCursor(x, y);
     _pd->println(msg);
 
     display();
 }
 
-void MiniDisplay::warning(const char *msg) {
+void MiniDisplay::warning(const char *msg, int16_t x = 0, int16_t y = 0) {
     clear();
 
     _pd->setTextSize(1);
     // Inverse text
     _pd->setTextColor(SSD1306_BLACK, SSD1306_WHITE);
-    _pd->setCursor(0, 0);
+    _pd->setCursor(x, y);
     _pd->println(msg);
 
     display();
@@ -96,6 +96,9 @@ void MiniDisplay::normal_face() {
     _pd->drawCircle(0.75 * width, 0.50 * height, 0.55 * max_r, SSD1306_WHITE);
     _pd->fillCircle(0.80 * width, 0.52 * height, 3, SSD1306_WHITE);
 
+    // Mouth
+    _pd->drawLine(0.3 * width, 0.9 * height, 0.7 * width, 0.82 * height);
+
     display();
 }
 
@@ -112,15 +115,23 @@ void MiniDisplay::blink_face() {
     _pd->drawLine(0.80 * width, 0.52 * height, 0.80 * width + 16, 0.52 * height - 10, SSD1306_WHITE);
     _pd->drawLine(0.80 * width, 0.52 * height, 0.72 * width + 18, 0.52 * height + 0, SSD1306_WHITE);
 
+    // Mouth
+    _pd->drawLine(0.3 * width, 0.9 * height, 0.7 * width, 0.82 * height);
+
     display();
 }
 
-void MiniDisplay::do_blink(int t) {
+void MiniDisplay::do_blink(int t = 200) {
     // Trick: let's make sure that the normal face 
-    // is present before blinking
+    // is present before blinking.
+    //
+    // NOTE: This will BLOCK, due to the delay.
+    // This is inaceptable if we are reading from
+    // an ultrasound sensor for example.
     normal_face();
     delay(250);
     blink_face();
     delay(t);
     normal_face();
 }
+
