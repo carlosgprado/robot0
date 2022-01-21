@@ -56,8 +56,11 @@ class MiniDisplay {
         void no_scroll();
 
         // Face stuff :)
+        void normal_eyes();
+        void blinking_eyes();
+
         void normal_face();
-        void blink_face();
+        void blinking_face();
         void do_blink(int t = 200);
     private:
         Adafruit_SSD1306 *_pd;

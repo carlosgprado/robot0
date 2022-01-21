@@ -81,10 +81,8 @@ void MiniDisplay::no_scroll() {
     _pd->stopscroll();
 }
 
-void MiniDisplay::normal_face() {
-    // Put a face on it!
+void MiniDisplay::normal_eyes() {
     // NOTE: xxxCircle(x, y, r, color)
-    clear();
 
     int16_t max_r = min(width, height) / 2;
 
@@ -95,18 +93,9 @@ void MiniDisplay::normal_face() {
     // Right eyeball (smaller)
     _pd->drawCircle(0.75 * width, 0.50 * height, 0.55 * max_r, SSD1306_WHITE);
     _pd->fillCircle(0.80 * width, 0.52 * height, 3, SSD1306_WHITE);
-
-    // Mouth
-    _pd->drawLine(0.3 * width, 0.95 * height, 0.7 * width, 0.88 * height, SSD1306_WHITE);
-
-    display();
 }
 
-void MiniDisplay::blink_face() {
-    // Blinking eyez: ><
-    // NOTE: drawLine(x1, y1, x2, y2, color)
-    clear();
-
+void MiniDisplay::blinking_eyes() {
     // Left blink
     _pd->drawLine(0.35 * width - 20, 0.42 * height - 10, 0.35 * width, 0.42 * height, SSD1306_WHITE);
     _pd->drawLine(0.35 * width - 16, 0.42 * height + 8, 0.35 * width, 0.42 * height, SSD1306_WHITE);
@@ -115,8 +104,30 @@ void MiniDisplay::blink_face() {
     _pd->drawLine(0.80 * width, 0.52 * height, 0.80 * width + 16, 0.52 * height - 10, SSD1306_WHITE);
     _pd->drawLine(0.80 * width, 0.52 * height, 0.72 * width + 18, 0.52 * height + 0, SSD1306_WHITE);
 
+}
+
+void MiniDisplay::normal_mouth() {
     // Mouth
     _pd->drawLine(0.3 * width, 0.95 * height, 0.7 * width, 0.88 * height, SSD1306_WHITE);
+}
+
+void MiniDisplay::normal_face() {
+    // Put a face on it!
+    clear();
+
+    normal_eyes();
+    normal_mouth();
+
+    display();
+}
+
+void MiniDisplay::blinking_face() {
+    // Blinking eyez: ><
+    // NOTE: drawLine(x1, y1, x2, y2, color)
+    clear();
+
+    blinking_eyes();
+    normal_mouth();
 
     display();
 }
@@ -130,7 +141,7 @@ void MiniDisplay::do_blink(int t = 200) {
     // an ultrasound sensor for example.
     normal_face();
     delay(250);
-    blink_face();
+    blinking_face();
     delay(t);
     normal_face();
 }
