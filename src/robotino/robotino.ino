@@ -21,10 +21,13 @@ RangeFinder rf01(7, 8);
 void splash() {
     // Dynamic splash message
     md01.large_message("robot0", 30, 25);
-    md01.invert(true);
-    delay(2000);
-    md01.invert(false);
-    delay(500);
+
+    for(uint16_t i = 0; i <= 3; i++) {
+        md01.invert(true);
+        delay(250);
+        md01.invert(false);
+        delay(250);
+    }
 
     // Blink a couple of times :)
     for (int i=0; i < 2; i++) {

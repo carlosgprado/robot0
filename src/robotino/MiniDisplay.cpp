@@ -37,8 +37,9 @@ void MiniDisplay::invert(bool bInvert) {
     _pd->invertDisplay(bInvert);
 }
 
-void MiniDisplay::message(const char *msg, int16_t x = 0, int16_t y = 0) {
-    clear();
+void MiniDisplay::message(const char *msg, bool c = true, int16_t x = 0, int16_t y = 0) {
+    if (c)
+        clear();
 
     _pd->setTextSize(1);
     _pd->setTextColor(WHITE);

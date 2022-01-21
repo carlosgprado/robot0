@@ -49,7 +49,7 @@ class MiniDisplay {
         void invert(bool bInvert);
 
         // Text stuff
-        void message(const char *msg, int16_t x = 0, int16_t y = 0);
+        void message(const char *msg, bool c = true, int16_t x = 0, int16_t y = 0);
         void large_message(const char *msg, int16_t x = 0, int16_t y = 0);
         void warning(const char *msg, int16_t x = 0, int16_t y = 0);
         void scroll(const char *msg, int16_t x = 0, int16_t y = 0);
@@ -57,6 +57,7 @@ class MiniDisplay {
 
         // Face stuff :)
         void normal_eyes();
+        void normal_mouth();
         void blinking_eyes();
 
         void normal_face();
