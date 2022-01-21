@@ -71,8 +71,8 @@ void MiniDisplay::warning(const char *msg, int16_t x = 0, int16_t y = 0) {
     display();
 }
 
-void MiniDisplay::scroll(const char *msg) {
-    large_message(msg);
+void MiniDisplay::scroll(const char *msg, int16_t x = 0, int16_t y = 0) {
+    large_message(msg, x , y);
     delay(100);
     _pd->startscrollright(0x00, 0x0F);
 }
@@ -97,7 +97,7 @@ void MiniDisplay::normal_face() {
     _pd->fillCircle(0.80 * width, 0.52 * height, 3, SSD1306_WHITE);
 
     // Mouth
-    _pd->drawLine(0.3 * width, 0.9 * height, 0.7 * width, 0.82 * height);
+    _pd->drawLine(0.3 * width, 0.95 * height, 0.7 * width, 0.88 * height, SSD1306_WHITE);
 
     display();
 }
@@ -116,7 +116,7 @@ void MiniDisplay::blink_face() {
     _pd->drawLine(0.80 * width, 0.52 * height, 0.72 * width + 18, 0.52 * height + 0, SSD1306_WHITE);
 
     // Mouth
-    _pd->drawLine(0.3 * width, 0.9 * height, 0.7 * width, 0.82 * height);
+    _pd->drawLine(0.3 * width, 0.95 * height, 0.7 * width, 0.88 * height, SSD1306_WHITE);
 
     display();
 }

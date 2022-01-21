@@ -49,16 +49,16 @@ class MiniDisplay {
         void invert(bool bInvert);
 
         // Text stuff
-        void message(const char *msg);
-        void large_message(const char *msg);
-        void warning(const char *msg);
-        void scroll(const char *msg);
+        void message(const char *msg, int16_t x = 0, int16_t y = 0);
+        void large_message(const char *msg, int16_t x = 0, int16_t y = 0);
+        void warning(const char *msg, int16_t x = 0, int16_t y = 0);
+        void scroll(const char *msg, int16_t x = 0, int16_t y = 0);
         void no_scroll();
 
         // Face stuff :)
         void normal_face();
         void blink_face();
-        void do_blink(int t);
+        void do_blink(int t = 200);
     private:
         Adafruit_SSD1306 *_pd;
 };

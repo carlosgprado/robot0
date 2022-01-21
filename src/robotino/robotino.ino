@@ -28,14 +28,14 @@ void setup() {
     }
 
     // Kind of an splash message
-    md01.large_message("robot0", 20, 10);
+    md01.large_message("robot0", 30, 25);
     md01.invert(true);
     delay(2000);
     md01.invert(false);
     delay(500);
 
     // Blink
-    for (int i=0; i < 3; i++) {
+    for (int i=0; i < 2; i++) {
         md01.do_blink();
         delay(2000);
     }
