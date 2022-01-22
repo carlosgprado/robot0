@@ -9,8 +9,6 @@
 #define SSD1306_NO_SPLASH
 
 
-bool is_message_displayed = false;
-
 // SSD1306 128x64 I2C
 MiniDisplay md01(SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -51,7 +49,7 @@ void track_the_blinks() {
     static unsigned long last_blink = 0;
     static bool is_blink_face = false;
 
-    if (is_message_displayed) {
+    if (md01.is_message_displayed) {
         // An important message is on screen
         // Skip these face shenanigans
         return;
@@ -87,21 +85,26 @@ void setup() {
 
 
 void loop() {
+    char buf[512];
+
     // Serial.println(rf.getDistance());
     delay(60);
 
-    // test display
-    if (millis() > 20000 && millis() < 25000) {
-        md01.large_message("IMPORTANT SHIT");
-        is_message_displayed = true;
-    }
+    char left[6] = {0};
+    char front[6] = {0};
+    char right[6] = {0};
 
-    if (millis() > 25000)
-        is_message_displayed = false;
+    
+    dtostrf(rf.getDistance(0), 4, 2, left);
+    dtostrf(rf.getDistance(1), 4, 2, front);
+    dtostrf(rf.getDistance(2), 4, 2, right);
 
-    Serial.println(millis());
+    md01.large_message(right);
 
+    // -----------------------------------------
     // "Face management" :)
     // Keep this always at the end
-    track_the_blinks();
+    // -----------------------------------------
+    // track_the_blinks();
 }
+

@@ -11,7 +11,7 @@ class RangeFinder {
 
         // Constructors
         RangeFinder(int trigPin, int echoPin);
-        RangeFinder(int trigPin, int echoPin[], int n);
+        RangeFinder(int trigPin, int* echoPins, int n);
 
         // Methods
         float getDistance();
@@ -20,9 +20,11 @@ class RangeFinder {
     private:
         int _trigPin;
         int _echoPin;
-        int _echoPins[];
         int _nr_sensors;
+
         HCSR04* _phc;
+
+        int* _echoPins;
 };
 
 #endif

@@ -16,7 +16,7 @@ RangeFinder::RangeFinder(int trigPin, int echoPin) {
 }
 
 /** Constructor (for multiple sensors) */
-RangeFinder::RangeFinder(int trigPin, int echoPins[], int n) {
+RangeFinder::RangeFinder(int trigPin, int* echoPins, int n) {
     _trigPin = trigPin;
     _echoPins = echoPins;
     _nr_sensors = n;

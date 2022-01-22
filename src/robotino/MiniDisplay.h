@@ -15,6 +15,7 @@ class MiniDisplay {
     public:
         int height = 0;
         int width = 0;
+        bool is_message_displayed = false;
 
         // Constructor
         MiniDisplay(int w, int h);
