@@ -16,8 +16,10 @@ MiniDisplay md01(SCREEN_WIDTH, SCREEN_HEIGHT);
 
 // HC-SR04 ultrasonic module
 // trig pin = 7
-// echo pin = 8
-RangeFinder rf01(7, 8);
+// echo pin left = 8
+// echo pin center = 9
+// echo pin right = 10
+RangeFinder rf(7, new int[3]{8, 9, 10}, 3);
 
 
 void splash() {
@@ -85,11 +87,7 @@ void setup() {
 
 
 void loop() {
-    // Wait for serial data
-    // while (!Serial) {}
-    // if (Serial.available() > 0) { /* do stuff with serial data */ }
-
-    // Serial.println(rf01.getDistance());
+    // Serial.println(rf.getDistance());
     delay(60);
 
     // test display

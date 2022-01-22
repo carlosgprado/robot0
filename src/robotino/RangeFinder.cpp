@@ -6,18 +6,27 @@
 #include "RangeFinder.h"
 
 
-/** Constructor */
+/** Constructor (for one sensor) */
 RangeFinder::RangeFinder(int trigPin, int echoPin) {
     _trigPin = trigPin;
     _echoPin = echoPin;
 
     // Initialize the HCSR04 object
     _phc = new HCSR04(_trigPin, _echoPin);
+}
 
-    // Setup
-    pinMode(_trigPin, OUTPUT);
-    pinMode(_echoPin, INPUT);
-    digitalWrite(_trigPin, LOW);
+/** Constructor (for multiple sensors) */
+RangeFinder::RangeFinder(int trigPin, int echoPins[], int n) {
+    _trigPin = trigPin;
+    _echoPins = echoPins;
+    _nr_sensors = n;
+
+    // Initialize the HCSR04 object
+    _phc = new HCSR04(_trigPin, _echoPins, _nr_sensors);
+}
+
+float RangeFinder::getDistance(int n) {
+    return _phc->dist(n);
 }
 
 float RangeFinder::getDistance() {

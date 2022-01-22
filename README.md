@@ -41,7 +41,12 @@ Use the `arduino-cli` tool:
 
 ## Arduino libraries
 
+- HCSR04 ultrasonic scanner 2.0.3 (gamegine)
+- Adafruit SSD1306 2.5.1 (Adafruit)
+
+
 ```shell
 ./arduino-cli lib install "HCSR04 ultrasonic sensor"
+./arduino-cli lib install "Adafruit SSD1306"
 ```
 
