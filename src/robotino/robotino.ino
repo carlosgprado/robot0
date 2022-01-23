@@ -69,6 +69,30 @@ void track_the_blinks() {
         }
 }
 
+void send_range_info() {
+    // --------------------------------------------------
+    // Read from the range sensors and send the data
+    // to the Raspberry Pi for motion processing
+    // --------------------------------------------------
+    char buf[24] = {0};
+    char left[6] = {0};
+    char front[6] = {0};
+    char right[6] = {0};
+
+    // Convert the float values to char*    
+    dtostrf(rf.getDistance(0), 4, 2, left);
+    dtostrf(rf.getDistance(1), 4, 2, front);
+    dtostrf(rf.getDistance(2), 4, 2, right);
+
+    strcpy(buf, left);
+    strcat(buf, ",");
+    strcpy(buf, front);
+    strcat(buf, ",");
+    strcpy(buf, right);
+
+    md01.message(buf);
+}
+
 void setup() {
     // Setup the serial connection
     Serial.begin(9600);
@@ -90,16 +114,7 @@ void loop() {
     // Serial.println(rf.getDistance());
     delay(60);
 
-    char left[6] = {0};
-    char front[6] = {0};
-    char right[6] = {0};
-
-    
-    dtostrf(rf.getDistance(0), 4, 2, left);
-    dtostrf(rf.getDistance(1), 4, 2, front);
-    dtostrf(rf.getDistance(2), 4, 2, right);
-
-    md01.large_message(right);
+    send_range_info();
 
     // -----------------------------------------
     // "Face management" :)
