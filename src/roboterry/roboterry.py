@@ -16,34 +16,6 @@ mc = None
 c = threading.Condition()
 
 
-def install_motor_failsafe():
-    """Installs a GPIO event callback.
-
-       The Arduino will pull up a pin if it detects
-       an obstacle to be too close. Generally this 
-       will not need to kick in (the RPi will take
-       care of it first), but better safe than broken robot
-    """
-    panic_pin = 25
-    gpio.setup(
-            panic_pin,
-            gpio.IN,
-            pull_up_down=gpio.PUD_UP
-            )
-
-    gpio.add_event_detect(
-            panic_pin,
-            gpio.RISING,
-            callback=emergency_stop,
-            bouncetime=500
-            )
-
-    print("[+] Installed motor fail-safe")
-
-
-def emergency_stop():
-    mc.stop()
-    print("[+] Emergency stop executed!")
 
 
 

@@ -26,6 +26,7 @@ class MotorController:
         self.left_en = 13   # EnA
         self.right_en = 12  # EnB
 
+        self.panic_pin = 25  # Emergency stop
         # PWM
         self.left_pwm = None
         self.right_pwm = None
@@ -38,6 +39,7 @@ class MotorController:
         self.speed_right = 33
 
         self._setup_pins()
+        self._install_motor_failsafe()
 
         self.stop()
 
@@ -57,6 +59,35 @@ class MotorController:
 
         self.left_pwm.start(self.speed_left)
         self.right_pwm.start(self.speed_right)
+
+    def _install_motor_failsafe(self):
+        """Installs a GPIO event callback.
+
+        The Arduino will pull up a pin if it detects
+        an obstacle to be too close. Generally this 
+        will not need to kick in (the RPi will take
+        care of it first), but better safe than broken robot
+        """
+
+        gpio.setup(
+                self.panic_pin,
+                gpio.IN,
+                pull_up_down=gpio.PUD_UP
+                )
+
+        gpio.add_event_detect(
+                self.panic_pin,
+                gpio.RISING,
+                callback=self._emergency_stop,
+                bouncetime=500
+                )
+
+        print("[+] Installed motor fail-safe")
+
+
+    def _emergency_stop(self):
+        self.stop()
+        print("[+] Emergency stop executed!")
 
     def check_lock(f):
         def wrapper(self, *args):
