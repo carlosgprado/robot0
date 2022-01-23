@@ -50,7 +50,7 @@ void track_the_blinks() {
     static unsigned long last_blink = 0;
     static bool is_blink_face = false;
 
-    if (md01.is_message_displayed) {
+    if (md01.is_message_displayed()) {
         // An important message is on screen
         // Skip these face shenanigans
         return;
@@ -102,6 +102,7 @@ void send_range_info() {
     if (min_d <= dangerous_d && min_d > 0) {
         // Pump the brakes!
         digitalWrite(PANIC_PIN, HIGH);
+        md01.large_message("TOO CLOSE!", 0, 0, 3000);
     }
 
     // Float to text. Seriously.
@@ -150,8 +151,6 @@ void setup() {
 
 
 void loop() {
-    md01.is_message_displayed = true;  // stop the face
-
     send_range_info();
 
     // -----------------------------------------

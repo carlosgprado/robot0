@@ -36,7 +36,7 @@ bool MiniDisplay::is_message_displayed() {
             no_scroll();
         }
 
-        return false
+        return false;
     }
 
     return true;
