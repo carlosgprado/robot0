@@ -75,13 +75,31 @@ void send_range_info() {
     // Read from the range sensors and send the data
     // to the Raspberry Pi for motion processing
     // --------------------------------------------------
-    float min_d = 20.0;
+    float dangerous_d = 15.0;
 
     float left_d = rf.getDistance(0);
     float front_d = rf.getDistance(1);
     float right_d = rf.getDistance(2);
 
-    if (left_d <= min_d || front_d <= min_d || right_d <= min_d) {
+    float tmp = min(left_d, front_d);
+    if (tmp == 0) {
+        // In case -both- are zero, this
+        // is solved later :)
+        if (front_d == 0)
+            tmp = left_d;
+        else
+            tmp = front_d;
+    }
+
+    float min_d = min(tmp, right_d);
+    if (min_d == 0) {
+        if (tmp == 0)
+            min_d = right_d;
+        else
+            min_d = tmp;
+    }
+
+    if (min_d <= dangerous_d && min_d > 0) {
         // Pump the brakes!
         digitalWrite(PANIC_PIN, HIGH);
     }
@@ -117,6 +135,7 @@ void setup() {
     Serial.begin(9600);
 
     // Initialize the panic pin (emergency break)
+    pinMode(PANIC_PIN, OUTPUT);
     digitalWrite(PANIC_PIN, LOW);
 
     // Setup the MiniDisplay
@@ -131,7 +150,7 @@ void setup() {
 
 
 void loop() {
-    md01.is_message_displayed = true  // stop the face
+    md01.is_message_displayed = true;  // stop the face
 
     send_range_info();
 

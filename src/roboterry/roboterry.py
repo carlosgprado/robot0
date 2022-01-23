@@ -70,7 +70,6 @@ class CommsThread(threading.Thread):
         self.name = name
 
     def run(self):
-        max_distance = 100
         min_distance = 25
         adjusted_speed = 100
 

@@ -86,9 +86,9 @@ class MotorController:
         print("[+] Installed motor fail-safe")
 
 
-    def _emergency_stop(self):
+    def _emergency_stop(self, channel):
         self.stop()
-        print("[+] Emergency stop executed!")
+        print(f"[+] Emergency stop (channel: {channel})")
 
     def check_lock(f):
         def wrapper(self, *args):
