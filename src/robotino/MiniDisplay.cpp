@@ -55,9 +55,6 @@ void MiniDisplay::invert(bool bInvert) {
 }
 
 void MiniDisplay::message(const char *msg, int16_t x, int16_t y, int16_t lasts) {
-    if (is_message_displayed())
-        return;
-
     clear();
 
     _pd->setTextSize(1);
@@ -72,9 +69,6 @@ void MiniDisplay::message(const char *msg, int16_t x, int16_t y, int16_t lasts) 
 }
 
 void MiniDisplay::large_message(const char *msg, int16_t x, int16_t y, int16_t lasts) {
-    if (is_message_displayed())
-        return;
-
     clear();
 
     _pd->setTextSize(2);
@@ -89,9 +83,6 @@ void MiniDisplay::large_message(const char *msg, int16_t x, int16_t y, int16_t l
 }
 
 void MiniDisplay::warning(const char *msg, int16_t x, int16_t y, int16_t lasts) {
-    if (is_message_displayed())
-        return;
-
     clear();
 
     _pd->setTextSize(1);
@@ -107,9 +98,6 @@ void MiniDisplay::warning(const char *msg, int16_t x, int16_t y, int16_t lasts) 
 }
 
 void MiniDisplay::scroll(const char *msg, int16_t x, int16_t y, int16_t lasts) {
-    if (is_message_displayed())
-        return;
-
     is_scrolling = true;
     large_message(msg, x , y);
     _pd->startscrollright(0x00, 0x0F);

@@ -123,7 +123,7 @@ void send_range_info() {
     strcat(buf, ",");
     strcat(buf, right);
 
-    md01.message(buf);
+    //md01.message(buf);
 
     delay(60);
 
