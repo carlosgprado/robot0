@@ -86,9 +86,9 @@ void send_range_info() {
 
     strcpy(buf, left);
     strcat(buf, ",");
-    strcpy(buf, front);
+    strcat(buf, front);
     strcat(buf, ",");
-    strcpy(buf, right);
+    strcat(buf, right);
 
     md01.message(buf);
 }
