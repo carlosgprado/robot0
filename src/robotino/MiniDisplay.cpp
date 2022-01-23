@@ -25,6 +25,23 @@ bool MiniDisplay::begin() {
     return false;
 }
 
+bool MiniDisplay::is_message_displayed() {
+    unsigned long now = millis();
+
+    if (now > msg_expires && msg_expires > 0) {
+        // The expiration date for this message has passed
+
+        if (is_scrolling) {
+            // The message is scrolling. Stop it.
+            no_scroll();
+        }
+
+        return false
+    }
+
+    return true;
+}
+
 void MiniDisplay::clear() {
     _pd->clearDisplay();
 }
@@ -37,9 +54,8 @@ void MiniDisplay::invert(bool bInvert) {
     _pd->invertDisplay(bInvert);
 }
 
-void MiniDisplay::message(const char *msg, bool c = true, int16_t x = 0, int16_t y = 0) {
-    if (c)
-        clear();
+void MiniDisplay::message(const char *msg, int16_t x, int16_t y, int16_t lasts) {
+    clear();
 
     _pd->setTextSize(1);
     _pd->setTextColor(WHITE);
@@ -47,9 +63,12 @@ void MiniDisplay::message(const char *msg, bool c = true, int16_t x = 0, int16_t
     _pd->println(msg);
 
     display();
+
+    // Set the expiration time for this message
+    msg_expires = millis() + lasts;
 }
 
-void MiniDisplay::large_message(const char *msg, int16_t x = 0, int16_t y = 0) {
+void MiniDisplay::large_message(const char *msg, int16_t x, int16_t y, int16_t lasts) {
     clear();
 
     _pd->setTextSize(2);
@@ -58,9 +77,12 @@ void MiniDisplay::large_message(const char *msg, int16_t x = 0, int16_t y = 0) {
     _pd->println(msg);
 
     display();
+
+    // Set the expiration time for this message
+    msg_expires = millis() + lasts;
 }
 
-void MiniDisplay::warning(const char *msg, int16_t x = 0, int16_t y = 0) {
+void MiniDisplay::warning(const char *msg, int16_t x, int16_t y, int16_t lasts) {
     clear();
 
     _pd->setTextSize(1);
@@ -70,16 +92,23 @@ void MiniDisplay::warning(const char *msg, int16_t x = 0, int16_t y = 0) {
     _pd->println(msg);
 
     display();
+
+    // Set the expiration time for this message
+    msg_expires = millis() + lasts;
 }
 
-void MiniDisplay::scroll(const char *msg, int16_t x = 0, int16_t y = 0) {
+void MiniDisplay::scroll(const char *msg, int16_t x, int16_t y, int16_t lasts) {
+    is_scrolling = true;
     large_message(msg, x , y);
-    delay(100);
     _pd->startscrollright(0x00, 0x0F);
+
+    // Set the expiration time for this message
+    msg_expires = millis() + lasts;
 }
 
 void MiniDisplay::no_scroll() {
     _pd->stopscroll();
+    is_scrolling = false;
 }
 
 void MiniDisplay::normal_eyes() {

@@ -15,7 +15,10 @@ class MiniDisplay {
     public:
         int height = 0;
         int width = 0;
-        bool is_message_displayed = false;
+
+        // Message expiration in ms.
+        unsigned long msg_expires = 0;
+        bool is_scrolling = false;
 
         // Constructor
         MiniDisplay(int w, int h);
@@ -25,12 +28,13 @@ class MiniDisplay {
         void clear();
         void display();
         void invert(bool bInvert);
+        bool is_message_displayed();
 
         // Text stuff
-        void message(const char *msg, bool c = true, int16_t x = 0, int16_t y = 0);
-        void large_message(const char *msg, int16_t x = 0, int16_t y = 0);
-        void warning(const char *msg, int16_t x = 0, int16_t y = 0);
-        void scroll(const char *msg, int16_t x = 0, int16_t y = 0);
+        void message(const char *msg, int16_t x = 0, int16_t y = 0, int16_t lasts = 5000);
+        void large_message(const char *msg, int16_t x = 0, int16_t y = 0, int16_t lasts = 5000);
+        void warning(const char *msg, int16_t x = 0, int16_t y = 0, int16_t lasts = 5000);
+        void scroll(const char *msg, int16_t x = 0, int16_t y = 0, int16_t lasts = 5000);
         void no_scroll();
 
         // Face stuff :)
