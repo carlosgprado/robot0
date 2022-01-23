@@ -7,6 +7,7 @@
 #include "MiniDisplay.h"
 
 #define SSD1306_NO_SPLASH
+#define PANIC_PIN 6
 
 
 // SSD1306 128x64 I2C
@@ -74,15 +75,28 @@ void send_range_info() {
     // Read from the range sensors and send the data
     // to the Raspberry Pi for motion processing
     // --------------------------------------------------
+    float min_d = 20.0;
+
+    float left_d = rf.getDistance(0);
+    float front_d = rf.getDistance(1);
+    float right_d = rf.getDistance(2);
+
+    if (left_d <= min_d || front_d <= min_d || right_d <= min_d) {
+        // Pump the brakes!
+        digitalWrite(PANIC_PIN, HIGH);
+    }
+
+    // Float to text. Seriously.
+    // Arduino lacks a float format string specifier.
     char buf[24] = {0};
     char left[6] = {0};
     char front[6] = {0};
     char right[6] = {0};
 
     // Convert the float values to char*    
-    dtostrf(rf.getDistance(0), 4, 2, left);
-    dtostrf(rf.getDistance(1), 4, 2, front);
-    dtostrf(rf.getDistance(2), 4, 2, right);
+    dtostrf(left_d, 4, 2, left);
+    dtostrf(front_d, 4, 2, front);
+    dtostrf(right_d, 4, 2, right);
 
     strcpy(buf, left);
     strcat(buf, ",");
@@ -94,11 +108,16 @@ void send_range_info() {
 
     delay(60);
 
+    // Reset the panic pin
+    digitalWrite(PANIC_PIN, LOW);
 }
 
 void setup() {
     // Setup the serial connection
     Serial.begin(9600);
+
+    // Initialize the panic pin (emergency break)
+    digitalWrite(PANIC_PIN, LOW);
 
     // Setup the MiniDisplay
     if(!md01.begin()) { 

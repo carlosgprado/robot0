@@ -27,6 +27,7 @@ class MotorController:
         self.right_en = 12  # EnB
 
         self.panic_pin = 25  # Emergency stop
+
         # PWM
         self.left_pwm = None
         self.right_pwm = None
