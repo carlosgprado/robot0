@@ -91,6 +91,9 @@ void send_range_info() {
     strcat(buf, right);
 
     md01.message(buf);
+
+    delay(60);
+
 }
 
 void setup() {
@@ -109,10 +112,7 @@ void setup() {
 
 
 void loop() {
-    char buf[512];
-
-    // Serial.println(rf.getDistance());
-    delay(60);
+    md01.is_message_displayed = true  // stop the face
 
     send_range_info();
 
@@ -120,6 +120,6 @@ void loop() {
     // "Face management" :)
     // Keep this always at the end
     // -----------------------------------------
-    // track_the_blinks();
+    track_the_blinks();
 }
 
