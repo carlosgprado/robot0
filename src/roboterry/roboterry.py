@@ -24,8 +24,6 @@ def main():
     parser.add_argument("--locked", action='store_true', default=False)
     args = parser.parse_args()
 
-    install_motor_failsafe()
-
     motor_thread = MotorThread(locked=args.locked)
     comms_thread = CommsThread()
 
