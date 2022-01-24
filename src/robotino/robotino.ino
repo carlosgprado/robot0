@@ -76,33 +76,34 @@ void send_range_info() {
     // to the Raspberry Pi for motion processing
     // --------------------------------------------------
     float dangerous_d = 15.0;
+    float min_d = 0;
+    float left_d = 0;
+    float front_d = 0;
+    float right_d = 0;
 
-    float left_d = rf.getDistance(0);
-    float front_d = rf.getDistance(1);
-    float right_d = rf.getDistance(2);
+    // Until I find the cause of the measurement
+    // fluctuations I will calculate an average
+    for (uint8_t i = 0; i < 3; i++) {
+        left_d += (rf.getDistance(0) / 3);
+        front_d += (rf.getDistance(1) / 3);
+        right_d += (rf.getDistance(2) / 3);
 
-    float tmp = min(left_d, front_d);
-    if (tmp == 0) {
-        // In case -both- are zero, this
-        // is solved later :)
-        if (front_d == 0)
-            tmp = left_d;
-        else
-            tmp = front_d;
+        delay(60);
     }
 
-    float min_d = min(tmp, right_d);
-    if (min_d == 0) {
-        if (tmp == 0)
-            min_d = right_d;
-        else
-            min_d = tmp;
-    }
+    // oooooo Emergency break oooooo
+    // Find the minimum distance
+    if (left_d < front_d && left_d < right_d)
+        min_d = left_d;
+    else if (front_d < right_d)
+        min_d = front_d;
+    else
+        min_d = right_d;
 
     if (min_d <= dangerous_d && min_d > 0) {
         // Pump the brakes!
         digitalWrite(PANIC_PIN, HIGH);
-        md01.large_message("TOO CLOSE!", 0, 0, 3000);
+        md01.large_message("TOO CLOSE!", 0, 0, 2000);
     }
 
     // Float to text. Seriously.
@@ -123,9 +124,7 @@ void send_range_info() {
     strcat(buf, ",");
     strcat(buf, right);
 
-    //md01.message(buf);
-
-    delay(60);
+    Serial.println(buf);
 
     // Reset the panic pin
     digitalWrite(PANIC_PIN, LOW);
