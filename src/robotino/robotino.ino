@@ -106,9 +106,9 @@ void send_range_info() {
     }
 
     Serial.print(left_d);
-    Serial.print(",")
+    Serial.print(",");
     Serial.print(front_d);
-    Serial.print(",")
+    Serial.print(",");
     Serial.println(right_d);
 
     delay(500);
