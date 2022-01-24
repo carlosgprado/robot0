@@ -13,12 +13,17 @@
 // SSD1306 128x64 I2C
 MiniDisplay md01(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-// HC-SR04 ultrasonic module
-// trig pin = 7
-// echo pin left = 8
-// echo pin center = 9
-// echo pin right = 10
-RangeFinder rf(7, new int[3]{8, 9, 10}, 3);
+// HC-SR04 ultrasonic modules
+int trig_left = 2;
+int echo_left = 3;
+int trig_front = 4;
+int echo_front = 5;
+int trig_right = 7;
+int echo_right = 8;
+
+RangeFinder rf_left(trig_left, echo_left);
+RangeFinder rf_front(trig_front, echo_front);
+RangeFinder rf_right(trig_right, echo_right);
 
 
 void splash() {
@@ -76,20 +81,14 @@ void send_range_info() {
     // to the Raspberry Pi for motion processing
     // --------------------------------------------------
     float dangerous_d = 15.0;
-    float min_d = 0;
-    float left_d = 0;
-    float front_d = 0;
-    float right_d = 0;
+    float min_d = 0.0;
+    float left_d = 0.0;
+    float front_d = 0.0;
+    float right_d = 0.0;
 
-    // Until I find the cause of the measurement
-    // fluctuations I will calculate an average
-    for (uint8_t i = 0; i < 3; i++) {
-        left_d += (rf.getDistance(0) / 3);
-        front_d += (rf.getDistance(1) / 3);
-        right_d += (rf.getDistance(2) / 3);
-
-        delay(60);
-    }
+    left_d = rf_left.getDistance();
+    front_d = rf_front.getDistance();
+    right_d = rf_right.getDistance();
 
     // oooooo Emergency break oooooo
     // Find the minimum distance
@@ -103,28 +102,16 @@ void send_range_info() {
     if (min_d <= dangerous_d && min_d > 0) {
         // Pump the brakes!
         digitalWrite(PANIC_PIN, HIGH);
-        md01.large_message("TOO CLOSE!", 0, 0, 2000);
+        md01.large_message("TOO CLOSE!", 0, 0, 1500);
     }
 
-    // Float to text. Seriously.
-    // Arduino lacks a float format string specifier.
-    char buf[24] = {0};
-    char left[6] = {0};
-    char front[6] = {0};
-    char right[6] = {0};
+    Serial.print(left_d);
+    Serial.print(",")
+    Serial.print(front_d);
+    Serial.print(",")
+    Serial.println(right_d);
 
-    // Convert the float values to char*    
-    dtostrf(left_d, 4, 2, left);
-    dtostrf(front_d, 4, 2, front);
-    dtostrf(right_d, 4, 2, right);
-
-    strcpy(buf, left);
-    strcat(buf, ",");
-    strcat(buf, front);
-    strcat(buf, ",");
-    strcat(buf, right);
-
-    Serial.println(buf);
+    delay(500);
 
     // Reset the panic pin
     digitalWrite(PANIC_PIN, LOW);
@@ -132,7 +119,7 @@ void send_range_info() {
 
 void setup() {
     // Setup the serial connection
-    Serial.begin(9600);
+    Serial.begin(115200);
 
     // Initialize the panic pin (emergency break)
     pinMode(PANIC_PIN, OUTPUT);
