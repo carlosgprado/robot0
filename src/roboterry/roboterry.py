@@ -64,7 +64,7 @@ class MotorThread(threading.Thread):
 
         while True:
             self.adjust_movement()
-            time.sleep(0.33)
+            time.sleep(0.05)
 
     def adjust_movement(self):
         stop_distance = 30
@@ -158,7 +158,7 @@ class CommsThread(threading.Thread):
             try:
                 l, f, r = data.split(b",")
                 left_d = float(l)
-                front_d = float(r)
+                front_d = float(f)
                 right_d = float(r)
             except Exception as e:
                 # Failed to convert to float
