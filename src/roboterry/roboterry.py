@@ -6,6 +6,7 @@ import time
 import random
 import threading
 import argparse
+from turtle import right
 
 from helpers.serial_comms import Cereal
 from helpers.motors import MotorController
@@ -13,10 +14,8 @@ from helpers.motors import MotorController
 # Global vars
 # Thread sync is hard :)
 mc = None
+g_dist = dict()
 c = threading.Condition()
-
-
-
 
 
 def main():
@@ -63,6 +62,60 @@ class MotorThread(threading.Thread):
         print("[+] Going forward...")
         mc.forward()
 
+        while True:
+            self.adjust_movement()
+            time.sleep(0.33)
+
+    def adjust_movement(self):
+        stop_distance = 30
+
+        # Read this info written by the "comms" thread
+        # This comes from the sensors connected at the Arduino
+        left_d = g_dist['left']
+        front_d = g_dist['front']
+        right_d = g_dist['right']
+
+        print(f"[+] dis: ({left_d:.2f}, {front_d:.2f}, {right_d:.2f}), speed: {mc.speed:.2f}")
+
+        # Take an action depending on which side is closer 
+        # to an obstacle
+
+        if left_d <= stop_distance:
+            print(f"[+] STAHP LEFT")
+            mc.stop()
+            mc.backward(1)
+
+            # Turn right
+            mc.turn_right(1)
+            mc.forward()
+
+        elif front_d <= stop_distance:
+            print(f"[+] STAHP FRONT")
+            mc.stop()
+            mc.backward(1)
+
+            # Chose where to turn
+            if left_d < right_d:
+                mc.turn_right(1)
+            elif right_d < left_d:
+                mc.turn_left(1)
+            else:
+                # The robot is equally close to left and right
+                # Perform a random turn
+                f = random.choice([mc.turn_left, mc.turn_right])
+                f(1)
+
+            mc.forward()
+
+        elif right_d <= stop_distance:
+            print(f"[+] STAHP RIGHT")
+            mc.stop()
+            mc.backward(1)
+
+            # Turn left
+            mc.turn_left(1)
+            mc.forward()
+
 
 class CommsThread(threading.Thread):
     def __init__(self, name="comms"):
@@ -70,8 +123,11 @@ class CommsThread(threading.Thread):
         self.name = name
 
     def run(self):
-        min_distance = 25
-        adjusted_speed = 100
+        global g_dist
+
+        left_d = 0
+        front_d = 0
+        right_d = 0
 
         # -------------------------------------
         # Setup serial communication
@@ -97,68 +153,29 @@ class CommsThread(threading.Thread):
                 continue
 
             # There is data on the input buffer
-            # TODO: right now the data is only distance
-            #  but it may be necessary to process this
-            #  input latter (maybe CSV?)
-
             data = bytez.strip(b"\r\n")
 
             try:
-                distance = float(data)
+                l, f, r = data.split(",")
+                left_d = float(l)
+                front_d = float(r)
+                right_d = float(r)
             except Exception as e:
                 # Failed to convert to float
                 # Probably garbage data
                 print(f"[-] WAT DIS: {data}")
+
+                # Stop just in case
                 mc.stop()
                 continue
 
-            print(f"[+] dis: {distance:.2f}, speed: ({mc.speed_left:.2f}, {mc.speed_right:.2f})")
-            # -----------------------------------------
-            # The sensor outputs some weird shit 
-            # sometimes. We need some failsafes.
-            # -----------------------------------------
-            if distance < 0:
-                # Weird shit, indeed
-                # Poll more data, maybe transitory
-                mc.stop()
-                print(f"[-] -ENEG: {distance}")
-                continue
-
-            # -----------------------------------------
-            # The sensor appears to measure max. 400 cm
-            # Diminishing distances will result in 
-            # lower speeds.
-            # NOTE: the max. distance this can measure
-            #       is around 400 cm
-            # -----------------------------------------
-            if distance > 100:
-                adjusted_speed = 100 / 3
-            else:
-                adjusted_speed = distance / 3
-
-            mc.set_speed(adjusted_speed)
-
-            # -----------------------------------------
-            # If we are too close to something, STAHP.
-            # -----------------------------------------
-            if distance <= min_distance:
-                print(f"[+] STAHP: {distance} cm.")
-                mc.stop()
-                mc.backward(1)
-
-                # Turn around
-                mc.turn_right(2)
-
-                # NOTE: when doing movements with a timeout
-                #  the thread is blocked, meaning the input
-                #  queue is filling up.
-                #  We need to either:
-                #  - flush it
-                #  - pass the movement information to the 
-                #    MotorController thread (better)
-                cereal._reset_queues()
-            else:
-                mc.forward()
+            # We communicate this info to the Motor thread
+            # by writing to this shared global variable
+            g_dist = {
+                'left': left_d,
+                'front': front_d,
+                'right': right_d
+                }
 
 
 if __name__ == '__main__':

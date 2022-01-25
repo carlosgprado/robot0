@@ -26,13 +26,20 @@ RangeFinder::RangeFinder(int trigPin, int* echoPins, int n) {
 }
 
 float RangeFinder::getDistance(int n) {
-    return _phc->dist(n);
+    float dist = _phc->dist(n);
+
+    if (dist == 0.0) {
+        // Damn it, err on the side of caution
+        dist = 100.0;
+    }
+
+    return dist;
 }
 
 float RangeFinder::getDistance() {
     // Measure the distant to an object in front
     // of the sensor (in cm.)
 
-    return _phc->dist();
+    return getDistance(0);
 }
 

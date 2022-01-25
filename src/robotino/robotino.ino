@@ -80,7 +80,7 @@ void send_range_info() {
     // Read from the range sensors and send the data
     // to the Raspberry Pi for motion processing
     // --------------------------------------------------
-    float dangerous_d = 15.0;
+    float dangerous_d = 20.0;
     float min_d = 0.0;
     float left_d = 0.0;
     float front_d = 0.0;
@@ -111,7 +111,7 @@ void send_range_info() {
     Serial.print(",");
     Serial.println(right_d);
 
-    delay(500);
+    delay(200);
 
     // Reset the panic pin
     digitalWrite(PANIC_PIN, LOW);
