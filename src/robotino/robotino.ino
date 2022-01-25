@@ -91,20 +91,22 @@ void send_range_info() {
     right_d = rf_right.getDistance();
 
     // oooooo Emergency break oooooo
-    // Find the minimum distance
-    if (left_d < front_d && left_d < right_d)
-        min_d = left_d;
-    else if (front_d < right_d)
-        min_d = front_d;
-    else
-        min_d = right_d;
-
-    if (min_d <= dangerous_d && min_d > 0) {
+    if (left_d <= dangerous_d && left_d > 0) {
         // Pump the brakes!
         digitalWrite(PANIC_PIN, HIGH);
-        md01.large_message("TOO CLOSE!", 0, 0, 1500);
+        md01.large_message("LEFT TOO CLOSE!", 0, 0, 1000);
+    } else if (front_d <= dangerous_d && front_d > 0) {
+        // Pump the brakes!
+        digitalWrite(PANIC_PIN, HIGH);
+        md01.large_message("FRONT TOO CLOSE!", 0, 0, 1000);
+    } else if (right_d <= dangerous_d && right_d > 0) {
+        // Pump the brakes!
+        digitalWrite(PANIC_PIN, HIGH);
+        md01.large_message("RIGHT TOO CLOSE!", 0, 0, 1000);
     }
 
+    // Send this info through the serial port
+    // to the Raspberry Pi
     Serial.print(left_d);
     Serial.print(",");
     Serial.print(front_d);
