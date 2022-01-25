@@ -220,7 +220,7 @@ class MotorController:
         # The motors can not do this at low speeds.
         # Temporarily set this to 100% for the turn
         saved_speed = self.speed_left
-        self._set_speed_left(100)
+        self._set_speed_left(80)
         self._left_forward()
 
         if timeout > 0:
@@ -236,7 +236,7 @@ class MotorController:
         # The motors can not do this at low speeds.
         # Temporarily set this to 100% for the turn
         saved_speed = self.speed_right
-        self._set_speed_right(100)
+        self._set_speed_right(80)
         self._right_forward()
 
         if timeout > 0:
@@ -250,7 +250,7 @@ class MotorController:
         """Call without arguments to circle forever"""
 
         saved_speed = self.speed_left
-        self._set_speed_left(100)
+        self._set_speed_left(80)
         self._left_backward()
 
         if timeout > 0:
@@ -264,7 +264,7 @@ class MotorController:
         """Call without arguments to circle forever"""
 
         saved_speed = self.speed_right
-        self._set_speed_right(100)
+        self._set_speed_right(80)
         self._right_backward()
 
         if timeout > 0:

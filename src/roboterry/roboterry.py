@@ -6,7 +6,6 @@ import time
 import random
 import threading
 import argparse
-from turtle import right
 
 from helpers.serial_comms import Cereal
 from helpers.motors import MotorController
