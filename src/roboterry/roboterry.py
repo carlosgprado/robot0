@@ -20,11 +20,14 @@ c = threading.Condition()
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--locked", action='store_true', default=False)
+    parser.add_argument("--locked", help="Lock motors by software (safe testing)", action='store_true', default=False)
+    parser.add_argument("--speed", help="Initial speed (0-100)", action='store')
     args = parser.parse_args()
 
-    motor_thread = MotorThread(locked=args.locked)
+    motor_thread = MotorThread(locked=args.locked, speed=args.speed)
     comms_thread = CommsThread()
+
+    print("[+] Starting threads...")
 
     motor_thread.start()
     comms_thread.start()
@@ -32,22 +35,30 @@ def main():
     comms_thread.join()
     motor_thread.join()
 
-    print("[+] Threads started")
+    # Cleanup
+    if mc is not None:
+        print("[+] robot0 stopped")
+        mc.stop()
 
 
 class MotorThread(threading.Thread):
-    def __init__(self, name="motor", locked=False):
+    def __init__(self, name="motor", locked=False, speed=None):
         threading.Thread.__init__(self)
         self.name = name
         self.locked = locked
+        self.speed = speed
 
     def run(self):
         global mc
 
         # -------------------------------------
-        # Setup microcontroller
+        # Setup motor controller
         # -------------------------------------
-        mc = MotorController()
+        if self.speed is not None:
+            _speed = float(self.speed)
+            mc = MotorController(initial_speed=_speed)
+        else:
+            mc = MotorController()
 
         print("[+] Motor controller OK")
         print("[+]", mc)
@@ -125,9 +136,13 @@ class CommsThread(threading.Thread):
     def run(self):
         global g_dist
 
-        left_d = 0
-        front_d = 0
-        right_d = 0
+        ld = 0
+        fd = 0
+        rd = 0
+
+        # Measurements of distances larger
+        # than this value are -very- noisy
+        measure_max = 80  # approx (cm.)
 
         # -------------------------------------
         # Setup serial communication
@@ -157,9 +172,7 @@ class CommsThread(threading.Thread):
 
             try:
                 l, f, r = data.split(b",")
-                left_d = float(l)
-                front_d = float(f)
-                right_d = float(r)
+                [ld, fd, rd] = [float(x) if float(x) < measure_max else measure_max for x in (l, f, r)]
             except Exception as e:
                 # Failed to convert to float
                 # Probably garbage data
@@ -172,9 +185,9 @@ class CommsThread(threading.Thread):
             # We communicate this info to the Motor thread
             # by writing to this shared global variable
             g_dist = {
-                'left': left_d,
-                'front': front_d,
-                'right': right_d
+                'left': ld,
+                'front': fd,
+                'right': rd
                 }
 
 

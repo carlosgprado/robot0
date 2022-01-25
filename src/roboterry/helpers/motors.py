@@ -18,7 +18,7 @@ HIGH = 1
 
 
 class MotorController:
-    def __init__(self):
+    def __init__(self, initial_speed=25):
         self.right_in = 23  # In1
         self.right_out = 24 # In2
         self.left_in = 22   # In3
@@ -35,9 +35,9 @@ class MotorController:
         gpio.setwarnings(False)
 
         self.locked = False
-        self.speed = 33
-        self.speed_left = 33
-        self.speed_right = 33
+        self.speed = initial_speed
+        self.speed_left = initial_speed
+        self.speed_right = initial_speed
 
         self._setup_pins()
         self._install_motor_failsafe()
