@@ -14,7 +14,7 @@ from helpers.motors import MotorController
 # Global vars
 # Thread sync is hard :)
 mc = None
-g_dist = dict()
+g_dist = {'left': 0, 'front': 0, 'right': 0}
 c = threading.Condition()
 
 
@@ -156,7 +156,7 @@ class CommsThread(threading.Thread):
             data = bytez.strip(b"\r\n")
 
             try:
-                l, f, r = data.split(",")
+                l, f, r = data.split(b",")
                 left_d = float(l)
                 front_d = float(r)
                 right_d = float(r)
