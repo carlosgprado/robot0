@@ -92,8 +92,8 @@ class MotorThread(threading.Thread):
 
         if left_d <= stop_distance:
             print(f"[+] STAHP LEFT")
-            mc.stop()
-            mc.backward(1)
+            # mc.stop()
+            # mc.backward(1)
 
             # Turn right
             mc.turn_right(1)
@@ -119,8 +119,8 @@ class MotorThread(threading.Thread):
 
         elif right_d <= stop_distance:
             print(f"[+] STAHP RIGHT")
-            mc.stop()
-            mc.backward(1)
+            # mc.stop()
+            # mc.backward(1)
 
             # Turn left
             mc.turn_left(1)
@@ -167,10 +167,12 @@ class CommsThread(threading.Thread):
                 continue
 
             # There is data on the input buffer
-            data = bytez.strip(b"\r\n")
+            data = bytez.decode('utf-8')
 
             try:
-                l, f, r = data.split(b",")
+                l, f, r = data.split(",")
+
+                # Apply a cutoff
                 [ld, fd, rd] = [float(x) if float(x) < measure_max else measure_max for x in (l, f, r)]
             except Exception as e:
                 # Failed to convert to float

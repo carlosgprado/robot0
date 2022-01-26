@@ -222,6 +222,7 @@ class MotorController:
         saved_speed = self.speed_left
         self._set_speed_left(80)
         self._left_forward()
+        self._right_backward()
 
         if timeout > 0:
             time.sleep(timeout)
@@ -238,6 +239,7 @@ class MotorController:
         saved_speed = self.speed_right
         self._set_speed_right(80)
         self._right_forward()
+        self._left_backward()
 
         if timeout > 0:
             time.sleep(timeout)
