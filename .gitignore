@@ -133,3 +133,6 @@ dmypy.json
 arduino-cli
 *.swp
 
+# Training data (images)
+training_data/
+
