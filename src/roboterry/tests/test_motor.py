@@ -8,23 +8,26 @@ mc = None
 
 
 def main():
-	global mc
+    global mc
 
-	mc = MotorController()
+    mc = MotorController()
 
-	back_and_forth(times=2)
-	forward_and_right_turn(times=3)
+    back_and_forth(times=2)
 
-	# Check locking mechanism
-	mc.lock()
-	# Should abort with an error message
-	mc.forward(1)
+    # Test locking mechanism
+    mc.lock()
 
-	# Unlock the motors
-	mc.unlock()
+    # Should abort with an error message
+    mc.forward(1)
 
-	# This will work, since we are unlocked
-	mc.turn_left(1.5)
+    # Unlock the motors
+    mc.unlock()
+
+    # This will work, since we are unlocked
+    mc.turn_left(1.5)
+    mc.turn_right_backward(1.5)
+    mc.turn_right(1.5)
+    mc.turn_left_backward(1.5)
 
 
 def loop_circle(times=1):
