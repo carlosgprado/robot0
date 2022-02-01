@@ -26,7 +26,9 @@ class MotorController:
         self.left_en = 13   # EnA
         self.right_en = 12  # EnB
 
-        self.panic_pin = 25  # Emergency stop
+        # Emergency stop
+        self.panic_pin = 25
+        self.last_panic = 0
 
         # PWM
         self.left_pwm = None
@@ -87,8 +89,25 @@ class MotorController:
 
 
     def _emergency_stop(self, channel):
-        self.stop()
-        print(f"[+] Emergency stop (channel: {channel})")
+        """This emergency stop failsafe kicks in
+           when the Arduino (faster) pulls up a 
+           GPIO pin. This is good, but there is 
+           such a thing as too much of a good thing :)
+
+           It is necessary to suppress too many
+           consecutive actions, or the robot will
+           not have time to correct course. This
+           causes a jittery movement otherwise.
+        """
+
+        now = time.time()
+        time_since_panic = now - self.last_panic
+
+        # Suppressing for 3s. should do the trick
+        if time_since_panic >= 3:
+            self.last_panic = now
+            self.stop()
+            print(f"[+] Emergency stop (channel: {channel})")
 
     def check_lock(f):
         def wrapper(self, *args):
@@ -219,8 +238,8 @@ class MotorController:
 
         # The motors can not do this at low speeds.
         # Temporarily set this to 100% for the turn
-        saved_speed = self.speed_left
-        self._set_speed_left(80)
+        saved_speed = self.speed
+        self.set_speed(80)
         self._left_forward()
         self._right_backward()
 
@@ -228,7 +247,7 @@ class MotorController:
             time.sleep(timeout)
             self.stop()
 
-        self._set_speed_left(saved_speed)
+        self.set_speed(saved_speed)
 
     @check_lock
     def turn_left(self, timeout=0):
@@ -236,8 +255,8 @@ class MotorController:
 
         # The motors can not do this at low speeds.
         # Temporarily set this to 100% for the turn
-        saved_speed = self.speed_right
-        self._set_speed_right(80)
+        saved_speed = self.speed
+        self.set_speed(80)
         self._right_forward()
         self._left_backward()
 
@@ -245,14 +264,14 @@ class MotorController:
             time.sleep(timeout)
             self.stop()
 
-        self._set_speed_right(saved_speed)
+        self.set_speed(saved_speed)
 
     @check_lock
     def turn_right_backward(self, timeout=0):
         """Call without arguments to circle forever"""
 
-        saved_speed = self.speed_left
-        self._set_speed_left(80)
+        saved_speed = self.speed
+        self.set_speed(80)
         self._left_backward()
         self._right_forward()
 
@@ -260,14 +279,14 @@ class MotorController:
             time.sleep(timeout)
             self.stop()
 
-        self._set_speed_left(saved_speed)
+        self.set_speed(saved_speed)
 
     @check_lock
     def turn_left_backward(self, timeout=0):
         """Call without arguments to circle forever"""
 
-        saved_speed = self.speed_right
-        self._set_speed_right(80)
+        saved_speed = self.speed
+        self.set_speed(80)
         self._right_backward()
         self._left_forward()
 
@@ -275,6 +294,6 @@ class MotorController:
             time.sleep(timeout)
             self.stop()
 
-        self._set_speed_right(saved_speed)
+        self.set_speed(saved_speed)
 
 

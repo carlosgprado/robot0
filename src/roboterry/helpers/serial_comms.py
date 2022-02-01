@@ -34,6 +34,7 @@ class Cereal:
 
         self.ser.reset_input_buffer()
         self.ser.reset_output_buffer()
+        self.ser.flush()
 
     def send(self):
         raise NotImplemented

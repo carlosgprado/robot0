@@ -46,6 +46,8 @@ class MotorThread(threading.Thread):
         self.name = name
         self.locked = locked
         self.speed = speed
+        self.last_dis = [0, 0, 0]
+        self.last_dis_change = time.time()
 
     def run(self):
         global mc
@@ -74,7 +76,49 @@ class MotorThread(threading.Thread):
 
         while True:
             self.adjust_movement()
+            self.track_distances()
             time.sleep(0.05)
+
+    def track_distances(self):
+        curr_dis = [
+                g_dist['left'],
+                g_dist['front'],
+                g_dist['right']
+                ]
+
+        if curr_dis == [80, 80, 80]:
+            # We are moving.
+            # We have a clear line of sight
+            self.last_dis_change = time.time()
+            self.last_dis = curr_dis
+            return
+
+        diffs = map(
+                lambda t: abs(t[0] - t[1]),
+                zip(curr_dis, self.last_dis)
+                )
+
+        # The sum of all distance differences
+        # in this interval of time.
+        # When the robot is stuck this is very
+        # small, although not null due to sensor noise
+        total_displacement = sum(diffs)
+
+        if total_displacement > 0.5:
+            # We are moving
+            # TODO: the threshold above is arbitrary
+            #  may need tweaking...
+            self.last_dis_change = time.time()
+            self.last_dis = curr_dis
+
+        # Check whether we are stuck, i.e. distances
+        # not changing for a long period of time
+        time_since_move = time.time() - self.last_dis_change
+        if time_since_move >= 3:
+            print("[-] I am stuck!")
+            mc.backward(1)
+            f = random.choice([mc.turn_left, mc.turn_right])
+            f(1)
 
     def adjust_movement(self):
         stop_distance = 30
