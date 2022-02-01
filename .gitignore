@@ -135,4 +135,5 @@ arduino-cli
 
 # Training data (images)
 training_data/
+cv_data/
 

@@ -19,7 +19,7 @@ class FaceRecognizer:
         self.face_recog = None
         self.haar_path = ""
         self.model_filepath = ""
-        self.trainig_data_folder = ""
+        self.training_folder = ""
         self.people = ["kieran", "franka", "carlos"]
 
         self._initialize_face_recognizer()
@@ -31,7 +31,9 @@ class FaceRecognizer:
         cur_dir = os.path.dirname(os.path.realpath(__file__))
         parent_dir = os.path.dirname(cur_dir)
         self.model_filepath = os.path.join(parent_dir, "data", "model", "face_recog_trained.yml")
-        self.trainig_data_folder = os.path.join(parent_dir, "data", "training_data")
+        self.haar_path = os.path.join(parent_dir, "data", "model", "haarcascade_frontalface_alt2.xml")
+        # self.haar_path = os.path.join(parent_dir, "data", "model", "haarcascade_frontalface_default.xml")
+        self.training_folder = os.path.join(parent_dir, "data", "training_data")
 
         if os.path.isfile(self.model_filepath):
             # We already have a model!
@@ -41,7 +43,7 @@ class FaceRecognizer:
             print(f"[-] Training model from scratch...")
             self.train_classifier()
 
-    def detect_face(self, img):
+    def detect_face(self, img, scale=1.05, nb=5):
         """Finds a face within a given image"""
 
         face_detector = cv2.CascadeClassifier(self.haar_path)
@@ -51,8 +53,10 @@ class FaceRecognizer:
         # NOTE: this expects the `img` to be gray-scale already
         face_list = face_detector.detectMultiScale(
             img,
-            scaleFactor=1.2,
-            minNeighbors=2
+            scaleFactor=scale,
+            minNeighbors=nb,
+            minSize=(128, 128),
+            flags=cv2.CASCADE_SCALE_IMAGE
             )
 
         # Faces are actually the coordinate information of a rectangle
@@ -73,16 +77,22 @@ class FaceRecognizer:
 
         return face_list, img
 
-    def get_training_data(self):
+    def get_training_data(self, scale=1.05, nb=5):
         """Training data contains images
            for each person labeled: <person_name>.<N>.jpg,
            e.g. "kieran.0.jpg", "franka.1.jpg", etc.
         """
 
+        idx_training_files = 0
         cropped_faces = []
         identifiers = []
 
         for filename in os.listdir(self.training_folder):
+            if filename.startswith("."):
+                continue
+
+            idx_training_files += 1
+
             filepath = os.path.join(self.training_folder, filename)
             person_name = filename.split(".")[0]
             face_id = self.people.index(person_name)  # {0, 1, 2, ...}
@@ -90,22 +100,28 @@ class FaceRecognizer:
             # PIL image, processed
             PIL_image = Image.open(filepath).convert('L')  # gray-scale
             np_image = np.array(PIL_image, 'uint8')  # byte-array
-            face_list, _ = self.detect_face(np_image)
+            face_list, _ = self.detect_face(np_image, scale=scale, nb=nb)
 
             if len(face_list) > 1:
                 print(f"[-] Warning: File {filename} contains more than one face! Skipping...")
+                continue
+
+            if len(face_list) == 0:
+                print(f"[-] Warning: File {filename} did NOT contain any face! Skipping...")
                 continue
 
             (x, y, w, h) = face_list[0]
             cropped_faces.append(np_image[y: y+h, x: x+w])
             identifiers.append(face_id)
 
+        print(f"[+] scale: {scale}, neighbours: {nb} -> Found faces on {len(cropped_faces)} / {idx_training_files} images")
+
         return cropped_faces, identifiers
 
-    def train_classifier(self):
+    def train_classifier(self, scale=1.05, nb=5):
         """Train the classifier algorithm"""
 
-        face_imgs, face_ids = self.get_training_data()
+        face_imgs, face_ids = self.get_training_data(scale=scale, nb=nb)
         self.face_recog.train(
             face_imgs,              # Inputs
             np.array(face_ids)      # Labeled outputs
@@ -115,6 +131,7 @@ class FaceRecognizer:
         # This has several advantages:
         #  - only have to train the model once
         #  - can train the model on a more powerful machine
+        print(f"[+] Saved model as {self.model_filepath}")
         self.face_recog.save(self.model_filepath)
 
         return self.face_recog
@@ -140,3 +157,4 @@ class FaceRecognizer:
         print(f"[+] {img_filepath} -> {person_name} (confidence: {confidence})")
 
         return self.people[label]
+
